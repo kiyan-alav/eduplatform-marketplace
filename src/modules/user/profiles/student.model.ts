@@ -3,7 +3,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import {
   IStudentProfileDocument,
   IStudentProfilePaginateModel,
-} from "../student.types";
+} from "./student.types";
 
 const StudentProfileSchema = new Schema<IStudentProfileDocument>(
   {
@@ -14,18 +14,24 @@ const StudentProfileSchema = new Schema<IStudentProfileDocument>(
       unique: true,
       index: true,
     },
-    enrolledCourses: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Course",
-      },
-    ],
-    interests: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
+    enrolledCourses: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Course",
+        },
+      ],
+      default: [],
+    },
+    interests: {
+      type: [
+        {
+          type: String,
+          trim: true,
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

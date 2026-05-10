@@ -11,8 +11,23 @@ export const validateRequest =
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        const msg = err.issues.map((e) => e.message).join(", ");
-        next(createHttpError(400, `Invalid input: ${msg}`));
+        const errors: Record<string, string[]> = {};
+
+        for (const issue of err.issues) {
+          const field = issue.path.join(".") || "root";
+
+          if (!errors[field]) {
+            errors[field] = [];
+          }
+
+          errors[field].push(issue.message);
+        }
+
+        next(
+          createHttpError(400, "Validation failed", {
+            errors,
+          }),
+        );
       } else {
         next(createHttpError(400, "Validation failed"));
       }

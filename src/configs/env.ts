@@ -12,6 +12,7 @@ const envSchema = z.object({
   ACCESS_EXPIRES: z.string().default("8h"),
   REFRESH_EXPIRES: z.string().default("7d"),
   LOG_LEVEL: z.enum(["debug", "info"]).default("info"),
+  BASE_URL: z.string()
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

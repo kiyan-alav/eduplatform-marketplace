@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -6,8 +7,7 @@ import path from "path";
 import pinoHttp from "pino-http";
 import { logger } from "./configs/logger";
 import { errorMiddleware } from "./middlewares/error.middleware";
-// import apiRoutes from "./routes";
-import cookieParser from "cookie-parser";
+import apiRoutes from "./modules/index";
 
 const app = express();
 
@@ -41,7 +41,7 @@ app.get("/", (_req, res) => {
   return res.json({ status: "OK", message: "EduPlatform API is running!!" });
 });
 
-// app.use("/api", apiRoutes);
+app.use("/api", apiRoutes);
 
 app.use((_req, _res, next) => next(createHttpError(404, "Route not found")));
 

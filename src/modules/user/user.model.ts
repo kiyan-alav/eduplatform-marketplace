@@ -1,6 +1,10 @@
 import { model, Schema } from "mongoose";
-import { IBaseUserDocument, IBaseUserPaginateModel, UserRole } from "./user.types";
 import mongoosePaginate from "mongoose-paginate-v2";
+import {
+  IBaseUserDocument,
+  IBaseUserPaginateModel,
+  UserRole,
+} from "./user.types";
 
 const BaseUserSchema = new Schema<IBaseUserDocument>(
   {
@@ -31,7 +35,6 @@ const BaseUserSchema = new Schema<IBaseUserDocument>(
       type: String,
       required: [true, "Password is required"],
       minLength: [6, "Password must be at least 6 character"],
-      select: false,
     },
     roles: {
       type: [String],

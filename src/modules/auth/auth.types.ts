@@ -3,6 +3,7 @@ export interface RegisterData {
   phone: string;
   fullName: string;
   password: string;
+  avatar?: string;
 }
 
 export interface LoginData {

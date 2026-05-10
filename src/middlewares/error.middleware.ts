@@ -29,6 +29,7 @@ export function errorMiddleware(
     success: false,
     message,
     ...(ENV.NODE_ENV === "development" && { stack: err.stack }),
+    errors: err.errors || null,
   });
 
   res.status(status).json(response);

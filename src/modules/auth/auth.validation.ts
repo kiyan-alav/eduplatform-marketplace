@@ -1,9 +1,11 @@
 import { z } from "zod";
 
+const phoneRegex = /^09\d{9}$/;
+
 export const registerSchema = z
   .object({
     email: z.email("Email is required"),
-    phone: z.string("Phone is required").regex(/^09\d{9}$/, "Invalid phone"),
+    phone: z.string("Phone is required").regex(phoneRegex, "Invalid phone"),
     fullName: z.string("fullname is required"),
     password: z
       .string("password is required")
@@ -16,6 +18,19 @@ export const registerSchema = z
   });
 
 export const loginSchema = z.object({
-  identifier: z.string("identifier is required"),
+  identifier: z
+    .string()
+    .min(1, "Identifier is required")
+    .refine(
+      (value) => {
+        const isEmail = z.email().safeParse(value).success;
+        const isPhone = phoneRegex.test(value);
+
+        return isEmail || isPhone;
+      },
+      {
+        message: "Identifier must be a valid email or phone number",
+      },
+    ),
   password: z.string("password is required"),
 });
