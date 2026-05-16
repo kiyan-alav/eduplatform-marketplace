@@ -1,17 +1,18 @@
 import createHttpError from "http-errors";
+import { PopulateOptions } from "mongoose";
 import {
   hashPassword,
   signAccessToken,
   signRefreshToken,
   verifyPassword,
+  verifyRefreshToken,
 } from "../../configs/jwt";
 import { hashToken } from "../../utils/token";
-import { StudentProfile } from "../user/profiles/student.model";
+import { StudentProfile } from "../user/profiles/student/student.model";
 import { User } from "../user/user.model";
 import { UserRole } from "../user/user.types";
 import { LoginData, RegisterData } from "./auth.types";
 import { RefreshTokenModel } from "./refresh.model";
-import { PopulateOptions } from "mongoose";
 
 export const authService = {
   async register(data: RegisterData) {
@@ -115,7 +116,76 @@ export const authService = {
     };
   },
 
-  async getMe() {},
+  async getMe(userId: string) {
+    const existingUser = await User.findById(userId);
 
-  async refreshToken() {},
+    if (!existingUser) {
+      throw createHttpError(404, "User not found");
+    }
+
+    const userRoles = existingUser.roles;
+    const populateFields: PopulateOptions[] = [];
+
+    if (userRoles.includes(UserRole.ADMIN)) {
+      populateFields.push({
+        path: "adminProfile",
+      });
+    }
+    if (userRoles.includes(UserRole.INSTRUCTOR)) {
+      populateFields.push({
+        path: "instructorProfile",
+        select: "bio expertise socialLinks verification payoutInfo",
+      });
+    }
+    if (userRoles.includes(UserRole.STUDENT)) {
+      populateFields.push({
+        path: "studentProfile",
+        select: "interests",
+      });
+    }
+
+    const user = await User.findById(userId)
+      .select("-passwordHash -__v")
+      .populate(populateFields)
+      .lean();
+
+    return user;
+  },
+
+  async refreshToken(token: string) {
+    if (!token) {
+      throw createHttpError(401, "Refresh token missing!");
+    }
+
+    let payload;
+
+    try {
+      payload = verifyRefreshToken(token);
+    } catch (error) {
+      throw createHttpError(401, "Invalid refresh token");
+    }
+
+    const tokenHash = hashToken(token);
+
+    const storedToken = await RefreshTokenModel.findOne({
+      user: payload.userId,
+      tokenHash,
+    });
+
+    if (!storedToken) {
+      throw createHttpError(401, "Refresh token revoked");
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      await storedToken.deleteOne();
+      throw createHttpError(401, "Refresh token expired");
+    }
+
+    const accessToken = signAccessToken({
+      userId: payload.userId,
+      roles: payload.roles,
+    });
+
+    return { accessToken };
+  },
 };

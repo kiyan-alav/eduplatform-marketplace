@@ -52,7 +52,7 @@ const InstructorProfileSchema = new Schema<IInstructorProfileDocument>(
     payoutInfo: {
       bankAccount: String,
       cardNumber: String,
-      shaba: String,
+      sheba: String,
     },
     createdCourses: [
       {

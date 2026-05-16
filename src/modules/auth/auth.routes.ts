@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authGuard } from "../../middlewares/auth.middleware";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { userAvatarUpload } from "../../utils/multer";
 import { authController } from "./auth.controller";
@@ -18,5 +19,9 @@ authRouter.post(
   validateRequest(loginSchema, "body"),
   authController.login,
 );
+
+authRouter.get("/me", authGuard, authController.getMe);
+
+authRouter.post("/refresh", authGuard, authController.refreshToken);
 
 export default authRouter;

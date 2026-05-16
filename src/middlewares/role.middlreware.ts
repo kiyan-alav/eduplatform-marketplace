@@ -9,7 +9,9 @@ export const roleGuard =
       return next(createHttpError(401, "Unauthorized"));
     }
 
-    if (!roles.includes(req.user.role)) {
+    const hasRole = req.user.roles.some((role) => roles.includes(role));
+
+    if (!hasRole) {
       return next(createHttpError(403, "Forbidden"));
     }
 

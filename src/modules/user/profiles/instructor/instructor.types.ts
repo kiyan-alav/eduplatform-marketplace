@@ -25,7 +25,7 @@ export interface IInstructorProfile {
   payoutInfo: {
     bankAccount?: string;
     cardNumber?: string;
-    shaba?: string;
+    sheba?: string;
   };
   createdCourses: Types.ObjectId[];
 }

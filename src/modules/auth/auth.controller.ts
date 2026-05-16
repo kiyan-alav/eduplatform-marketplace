@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { ENV } from "../../configs/env";
+import { AuthRequest } from "../../middlewares/auth.middleware";
 import { buildApiResponse } from "../../types/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { authService } from "./auth.service";
@@ -50,7 +52,38 @@ export const authController = {
     return res.status(200).json(response);
   }),
 
-  getMe: asyncHandler(async (req: Request, res: Response) => {}),
+  getMe: asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+      throw createHttpError(401, "Unauthorized");
+    }
 
-  refreshToken: asyncHandler(async (req: Request, res: Response) => {}),
+    const user = await authService.getMe(req.user.userId);
+
+    const response = buildApiResponse({
+      success: true,
+      data: user,
+    });
+
+    res.status(200).json(response);
+  }),
+
+  refreshToken: asyncHandler(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
+
+    const { accessToken } = await authService.refreshToken(refreshToken);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: ENV.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 8 * 60 * 60 * 1000,
+    });
+
+    const response = buildApiResponse({
+      success: true,
+      message: "Token refreshed successfully!",
+    });
+
+    return res.status(200).json(response);
+  }),
 };
