@@ -12,6 +12,7 @@ export const authGuard = (
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
+
   if (!authHeader?.startsWith("Bearer ")) {
     return next(createHttpError(401, "Unauthorized"));
   }
@@ -21,7 +22,7 @@ export const authGuard = (
   try {
     const payload = verifyAccessToken(token);
     req.user = payload;
-    next();
+    return next();
   } catch (err) {
     return next(createHttpError(401, "Invalid or expired token"));
   }

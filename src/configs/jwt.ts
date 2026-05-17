@@ -3,10 +3,11 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { z } from "zod";
 import { ENV } from "./env";
+import { UserRole } from "../modules/user/user.types";
 
 export interface JwtPayload {
   userId: string;
-  roles: string[];
+  roles: UserRole[];
 }
 
 export const signAccessToken = (payload: JwtPayload) => {

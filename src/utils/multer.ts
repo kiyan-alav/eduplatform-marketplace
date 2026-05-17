@@ -68,3 +68,8 @@ export const coursesVideoUpload = makeUploader(
   ["video/mp4", "video/mkv", "video/webm"],
   200,
 );
+export const instructorDocumentUpload = makeUploader(
+  "instructor/docs",
+  ["image/png", "image/jpeg", "image/jpg", "image/webp"],
+  3,
+);

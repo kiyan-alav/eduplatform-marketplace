@@ -6,11 +6,11 @@ export const registerSchema = z
   .object({
     email: z.email("Email is required"),
     phone: z.string("Phone is required").regex(phoneRegex, "Invalid phone"),
-    fullName: z.string("fullname is required"),
+    fullName: z.string("Fullname is required"),
     password: z
-      .string("password is required")
+      .string("Password is required")
       .min(6, "Password must be at least 6 characters"),
-    confirm: z.string("confirm password is required"),
+    confirm: z.string("Confirm password is required"),
   })
   .refine((data) => data.password === data.confirm, {
     error: "Passwords do not match",
@@ -32,5 +32,5 @@ export const loginSchema = z.object({
         message: "Identifier must be a valid email or phone number",
       },
     ),
-  password: z.string("password is required"),
+  password: z.string("Password is required"),
 });
