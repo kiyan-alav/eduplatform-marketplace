@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logger } from "./logger";
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(5000),
@@ -12,15 +13,15 @@ const envSchema = z.object({
   ACCESS_EXPIRES: z.string().default("8h"),
   REFRESH_EXPIRES: z.string().default("7d"),
   LOG_LEVEL: z.enum(["debug", "info"]).default("info"),
-  BASE_URL: z.string()
+  BASE_URL: z.string(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  console.error("Invalid environment variables");
+  logger.error("Invalid environment variables");
   const tree = z.treeifyError(parsedEnv.error);
-  console.error(tree);
+  logger.error(tree);
   process.exit(1);
 }
 

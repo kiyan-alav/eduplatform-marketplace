@@ -8,7 +8,7 @@ export const validateRequest =
     try {
       const result = await schema.parseAsync(req[property] || {});
       req[property] = result;
-      next();
+      return next();
     } catch (err) {
       if (err instanceof ZodError) {
         const errors: Record<string, string[]> = {};
@@ -23,13 +23,13 @@ export const validateRequest =
           errors[field].push(issue.message);
         }
 
-        next(
+        return next(
           createHttpError(400, "Validation failed", {
             errors,
           }),
         );
       } else {
-        next(createHttpError(400, "Validation failed"));
+        return next(createHttpError(400, "Validation failed"));
       }
     }
   };

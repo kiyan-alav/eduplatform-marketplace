@@ -8,7 +8,11 @@ import { UserRole } from "./user.types";
 import { UpdateProfileInput } from "./user.validation";
 
 export const userService = {
-  async updateProfile(userId: string, payload: UpdateProfileInput, avatar?: string) {
+  async updateProfile(
+    userId: string,
+    payload: UpdateProfileInput,
+    avatar?: string,
+  ) {
     const user = await User.findById(userId);
     if (!user) throw createHttpError.NotFound("User not found");
 
