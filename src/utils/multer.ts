@@ -11,7 +11,7 @@ export const makeUploader = (
   maxSizeMB: number = 5,
 ) => {
   const __dirname = path.resolve();
-  const uploadDir = path.join(__dirname, "..", "..", "public", folder);
+  const uploadDir = path.join(__dirname, "public", folder);
 
   logger.info(uploadDir);
 

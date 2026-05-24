@@ -13,7 +13,8 @@ const app = express();
 
 const __dirname = path.resolve();
 
-app.use("/public", express.static(path.join(__dirname, "..", "public")));
+app.use("/public", express.static(path.join(__dirname, "public")));
+
 // app.use(
 //   helmet({
 //     contentSecurityPolicy: {

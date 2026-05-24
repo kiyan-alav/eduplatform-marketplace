@@ -62,9 +62,10 @@ export function buildQueryFilters<T>(
   if (config.enumList?.length) {
     for (const key of config.enumList) {
       const value = filter[key as string];
-      if (typeof value === "string" && value.includes(",")) {
+      if (value) {
+        const items = Array.isArray(value) ? value : String(value).split(",");
         (mongoFilter as any)[key as string] = {
-          $in: value.split(",").map((v) => v.trim()),
+          $in: items.map((v) => v.trim()),
         };
       }
     }
