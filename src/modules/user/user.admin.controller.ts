@@ -6,12 +6,20 @@ import { adminUserService } from "./user.admin.service";
 
 export const adminUserController = {
   users: asyncHandler(async (req: Request, res: Response) => {
-    const usersList = await adminUserService.userList(req.query);
+    const usersData = await adminUserService.userList(req.query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: usersList,
+      data: usersData.docs,
+      meta: {
+        limit: usersData.limit,
+        page: usersData.page as number,
+        total: usersData.totalDocs,
+        totalPages: usersData.totalPages,
+        hasNextPage: usersData.hasNextPage,
+        hasPrevPage: usersData.hasPrevPage,
+      },
     });
 
     return res.status(200).json(response);
@@ -32,13 +40,21 @@ export const adminUserController = {
   }),
 
   instructorRequests: asyncHandler(async (req: Request, res: Response) => {
-    const instructorRequestsList =
+    const instructorRequestsData =
       await adminUserService.instructorRequestsList(req.query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: instructorRequestsList,
+      data: instructorRequestsData.docs,
+      meta: {
+        limit: instructorRequestsData.limit,
+        page: instructorRequestsData.page as number,
+        total: instructorRequestsData.totalDocs,
+        totalPages: instructorRequestsData.totalPages,
+        hasNextPage: instructorRequestsData.hasNextPage,
+        hasPrevPage: instructorRequestsData.hasPrevPage,
+      },
     });
 
     return res.status(200).json(response);

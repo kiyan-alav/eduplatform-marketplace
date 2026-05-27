@@ -7,7 +7,7 @@ export const validateRequest =
   async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const result = await schema.parseAsync(req[property] || {});
-      req[property] = result;
+      Object.assign(req[property], result);
       return next();
     } catch (err) {
       if (err instanceof ZodError) {
@@ -28,8 +28,8 @@ export const validateRequest =
             errors,
           }),
         );
-      } else {
-        return next(createHttpError(400, "Validation failed"));
       }
+      console.error("Unexpected Validation Error:", err); 
+      return next(createHttpError(400, (err as Error).message || "Validation failed 2"));
     }
   };

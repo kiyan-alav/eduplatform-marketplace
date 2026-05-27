@@ -8,6 +8,9 @@ import {
   verifyRefreshToken,
 } from "../../configs/jwt";
 import { hashToken } from "../../utils/token";
+import "../user/profiles/admin/admin.model";
+import "../user/profiles/instructor/instructor.model";
+import "../user/profiles/student/student.model";
 import { StudentProfile } from "../user/profiles/student/student.model";
 import { User } from "../user/user.model";
 import { UserRole } from "../user/user.types";

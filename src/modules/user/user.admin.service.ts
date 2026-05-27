@@ -24,12 +24,33 @@ export const adminUserService = {
   },
 
   async singleUser(id: string) {
-    const user = await User.findById(id);
+    const query = User.findById(id);
 
-    if (!user) {
+    const userDoc = await User.findById(id).select("roles");
+
+    if (!userDoc) {
       throw createHttpError(404, "User not found");
     }
 
+    if (userDoc.roles.includes(UserRole.ADMIN)) {
+      query.populate({
+        path: "adminProfile",
+      });
+    }
+    if (userDoc.roles.includes(UserRole.INSTRUCTOR)) {
+      query.populate({
+        path: "instructorProfile",
+        select: "bio expertise socialLinks verification payoutInfo",
+      });
+    }
+    if (userDoc.roles.includes(UserRole.STUDENT)) {
+      query.populate({
+        path: "studentProfile",
+        select: "interests",
+      });
+    }
+
+    const user = await query.exec();
     return user;
   },
 
@@ -39,7 +60,7 @@ export const adminUserService = {
       instructorRequestsFilterConfig,
     );
 
-    mongoFilter["instructorProfile"] = { $ne: null };
+    mongoFilter["instructorProfile"] = { $exists: true, $ne: null };
 
     const result = await User.paginate(mongoFilter, {
       ...options,
@@ -66,11 +87,9 @@ export const adminUserService = {
   },
 
   async applyInstructorRequest(id: string) {
-    const user = await User.findById(id)
-      .populate<{
-        instructorProfile: IInstructorProfileDocument;
-      }>("instructorProfile")
-      .lean();
+    const user = await User.findById(id).populate<{
+      instructorProfile: IInstructorProfileDocument;
+    }>("instructorProfile");
 
     if (!user) {
       throw createHttpError(404, "User not found");
@@ -105,11 +124,9 @@ export const adminUserService = {
   },
 
   async rejectInstructorRequest(userId: string) {
-    const user = await User.findById(userId)
-      .populate<{
-        instructorProfile: IInstructorProfileDocument;
-      }>("instructorProfile")
-      .lean();
+    const user = await User.findById(userId).populate<{
+      instructorProfile: IInstructorProfileDocument;
+    }>("instructorProfile");
 
     if (!user) {
       throw createHttpError(404, "User not found");

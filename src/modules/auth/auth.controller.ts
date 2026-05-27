@@ -11,7 +11,7 @@ export const authController = {
     const userData = {
       ...req.body,
       avatar: req.file
-        ? `${ENV.BASE_URL}/public/users/avatar/${req.file.filename}`
+        ? `${ENV.BASE_URL}/public/users/avatars/${req.file.filename}`
         : null,
     };
 

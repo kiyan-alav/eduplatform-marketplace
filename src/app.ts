@@ -11,9 +11,9 @@ import apiRoutes from "./modules/index";
 
 const app = express();
 
-const __dirname = path.resolve();
+const rootDirectory = process.cwd();
 
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(rootDirectory, "public")));
 
 // app.use(
 //   helmet({

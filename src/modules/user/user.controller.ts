@@ -10,7 +10,7 @@ export const userController = {
     const userId = req.user!.userId;
 
     const avatar = req.file
-      ? `${ENV.BASE_URL}/public/users/avatar/${req.file.filename}`
+      ? `${ENV.BASE_URL}/public/users/avatars/${req.file.filename}`
       : undefined;
 
     const user = await userService.updateProfile(userId, req.body, avatar);

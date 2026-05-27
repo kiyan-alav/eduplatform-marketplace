@@ -12,12 +12,17 @@ export const authGuard = (
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
+  const bearerToken = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return next(createHttpError(401, "Unauthorized"));
+  const cookieToken = req.cookies?.accessToken;
+
+  const token = bearerToken || cookieToken;
+
+  if (!token) {
+    return next(createHttpError(401, "Unauthorized: No token provided"));
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const payload = verifyAccessToken(token);
