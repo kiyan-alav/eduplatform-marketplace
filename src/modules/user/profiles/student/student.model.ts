@@ -12,7 +12,6 @@ const StudentProfileSchema = new Schema<IStudentProfileDocument>(
       ref: "User",
       required: true,
       unique: true,
-      index: true,
     },
     enrolledCourses: {
       type: [

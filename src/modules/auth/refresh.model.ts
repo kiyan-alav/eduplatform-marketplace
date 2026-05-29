@@ -19,13 +19,11 @@ const RefreshTokenSchema = new Schema<IRefreshTokenDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     tokenHash: {
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     expiresAt: {
       type: Date,
@@ -41,6 +39,7 @@ RefreshTokenSchema.plugin(mongoosePaginate);
 
 // ! TTL index => for auto delete expired token
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+RefreshTokenSchema.index({ user: 1 });
 
 export const RefreshTokenModel = model<
   IRefreshTokenDocument,

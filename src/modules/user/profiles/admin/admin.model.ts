@@ -12,7 +12,6 @@ const AdminProfileSchema = new Schema<IAdminProfileDocument>(
       ref: "User",
       required: true,
       unique: true,
-      index: true,
     },
   },
   {

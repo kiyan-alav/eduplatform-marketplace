@@ -13,7 +13,6 @@ const InstructorProfileSchema = new Schema<IInstructorProfileDocument>(
       ref: "User",
       required: true,
       unique: true,
-      index: true,
     },
     bio: {
       type: String,
@@ -46,7 +45,6 @@ const InstructorProfileSchema = new Schema<IInstructorProfileDocument>(
         type: String,
         enum: Object.values(InstructorRequestStatus),
         default: InstructorRequestStatus.PENDING,
-        index: true,
       },
     },
     payoutInfo: {
@@ -67,6 +65,8 @@ const InstructorProfileSchema = new Schema<IInstructorProfileDocument>(
 );
 
 InstructorProfileSchema.plugin(mongoosePaginate);
+
+InstructorProfileSchema.index({ "verification.status": 1, createdAt: -1 });
 
 export const InstructorProfile = model<
   IInstructorProfileDocument,

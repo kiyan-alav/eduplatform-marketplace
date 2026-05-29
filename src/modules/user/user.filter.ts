@@ -1,5 +1,6 @@
 // user.filters.ts
 import { z } from "zod";
+import { PaginationSchema } from "../../utils/paginationSchema";
 import { FilterConfig } from "../../utils/query-builder";
 import { IUserFilter } from "./user.types";
 
@@ -16,18 +17,6 @@ export const instructorRequestsFilterConfig: FilterConfig<IUserFilter> = {
   exact: [],
   enumList: [],
 };
-
-const PaginationSchema = z.object({
-  page: z
-    .preprocess((val) => Number(val), z.number().min(1))
-    .optional()
-    .default(1),
-  limit: z
-    .preprocess((val) => Number(val), z.number().min(1).max(100))
-    .optional()
-    .default(10),
-  sort: z.string().optional().default("-createdAt"),
-});
 
 export const UserListQuerySchema = PaginationSchema.extend({
   search: z.string().optional(),

@@ -15,14 +15,12 @@ const BaseUserSchema = new Schema<IBaseUserDocument>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     phone: {
       type: String,
       required: [true, "Phone is required"],
       match: [/^09\d{9}$/, "Invalid phone"],
       unique: true,
-      index: true,
     },
     fullName: {
       type: String,
@@ -60,6 +58,9 @@ const BaseUserSchema = new Schema<IBaseUserDocument>(
 );
 
 BaseUserSchema.plugin(mongoosePaginate);
+
+BaseUserSchema.index({ createdAt: -1 });
+BaseUserSchema.index({ roles: 1, createdAt: -1 });
 
 export const User = model<IBaseUserDocument, IBaseUserPaginateModel>(
   "User",
