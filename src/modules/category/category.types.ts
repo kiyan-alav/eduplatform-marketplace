@@ -17,3 +17,14 @@ export interface ICategory {
 export interface ICategoryDocument extends ICategory, Document {}
 
 export interface ICategoryPaginateModel extends PaginateModel<ICategoryDocument> {}
+
+// ! ─── Request Types ────────────────────────────────────────────
+export interface ICreateCategoryRequest {
+  name: string;
+  slug?: string;
+}
+
+export interface IUpdateCategoryRequest {
+  name?: string;
+  slug?: string;
+}

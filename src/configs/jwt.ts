@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { z } from "zod";
-import { ENV } from "./env";
 import { UserRole } from "../modules/user/user.types";
+import { ENV } from "./env";
 
 export interface JwtPayload {
   userId: string;

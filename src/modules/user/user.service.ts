@@ -16,28 +16,43 @@ export const userService = {
     const user = await User.findById(userId);
     if (!user) throw createHttpError.NotFound("User not found");
 
-    if (payload.fullName) {
-      user.fullName = payload.fullName;
+    if (typeof payload.fullName === "string") {
+      user.fullName = payload.fullName.trim();
     }
 
-    if (avatar) {
+    if (typeof avatar === "string") {
       user.avatar = avatar;
     }
 
+    if (payload.studentProfile) {
+      if (!user.studentProfile)
+        throw createHttpError(400, "Student profile not found");
+      await StudentProfile.findByIdAndUpdate(
+        user.studentProfile,
+        {
+          $set: payload.studentProfile,
+        },
+        {
+          runValidators: true,
+        },
+      );
+    }
+
+    if (payload.instructorProfile) {
+      if (!user.instructorProfile)
+        throw createHttpError(400, "Instructor profile not found");
+      await InstructorProfile.findByIdAndUpdate(
+        user.instructorProfile,
+        {
+          $set: payload.instructorProfile,
+        },
+        {
+          runValidators: true,
+        },
+      );
+    }
+
     await user.save();
-
-    if (payload.studentProfile && user.studentProfile) {
-      await StudentProfile.findByIdAndUpdate(user.studentProfile, {
-        $set: payload.studentProfile,
-      });
-    }
-
-    if (payload.instructorProfile && user.instructorProfile) {
-      await InstructorProfile.findByIdAndUpdate(user.instructorProfile, {
-        $set: payload.instructorProfile,
-      });
-    }
-
     return user;
   },
 
