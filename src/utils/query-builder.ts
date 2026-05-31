@@ -52,8 +52,12 @@ export function buildQueryFilters<T>(
 
   if (config.exact?.length) {
     for (const key of config.exact) {
-      const value = filter[key as string];
+      let value = filter[key as string];
+
       if (value !== undefined && value !== null && value !== "") {
+        if (value === "true") value = true;
+        if (value === "false") value = false;
+
         (mongoFilter as any)[key as string] = value;
       }
     }

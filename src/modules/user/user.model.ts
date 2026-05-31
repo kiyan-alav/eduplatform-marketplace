@@ -39,7 +39,6 @@ const BaseUserSchema = new Schema<IBaseUserDocument>(
       enum: Object.values(UserRole),
       default: [UserRole.STUDENT],
       required: [true, "Role must be defined!"],
-      index: true,
     },
     avatar: {
       type: String,
