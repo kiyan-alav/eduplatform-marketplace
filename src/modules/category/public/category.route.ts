@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { validateRequest } from "../../middlewares/validateRequest";
+import { CategoryListQuerySchema } from "../category.filter";
+import { validateRequest } from "../../../middlewares/validateRequest";
 import { categoryController } from "./category.controller";
-import { CategoryListQuerySchema } from "./category.filter";
 
 const categoryRouter = Router();
 

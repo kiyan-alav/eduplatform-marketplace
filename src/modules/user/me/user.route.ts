@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { authGuard } from "../../middlewares/auth.middleware";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { instructorDocumentUpload, userAvatarUpload } from "../../utils/multer";
+import { authGuard } from "../../../middlewares/auth.middleware";
+import { validateRequest } from "../../../middlewares/validateRequest";
+import {
+  instructorDocumentUpload,
+  userAvatarUpload,
+} from "../../../utils/multer";
+import { updatePasswordSchema, updateProfileSchema } from "../user.validation";
 import { userController } from "./user.controller";
-import { updatePasswordSchema, updateProfileSchema } from "./user.validation";
 
 const userRouter = Router();
 

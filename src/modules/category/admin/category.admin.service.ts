@@ -1,13 +1,10 @@
 import createHttpError from "http-errors";
 import slugify from "slugify";
-import { buildQueryFilters } from "../../utils/query-builder";
-import { categoryFilterConfig } from "./category.filter";
-import { Category } from "./category.model";
-import {
-  ICategoryFilter,
-  ICreateCategoryRequest,
-  IUpdateCategoryRequest,
-} from "./category.types";
+import { ICategoryFilter, ICreateCategoryRequest, IUpdateCategoryRequest } from "../category.types";
+import { buildQueryFilters } from "../../../utils/query-builder";
+import { categoryFilterConfig } from "../category.filter";
+import { Category } from "../category.model";
+
 
 export const categoryAdminService = {
   async getAll(filters: ICategoryFilter) {

@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { paramsSchema } from "../../configs/jwt";
-import { authGuard } from "../../middlewares/auth.middleware";
-import { roleGuard } from "../../middlewares/role.middlreware";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { UserRole } from "../user/user.types";
-import { categoryAdminController } from "./category.admin.controller";
-import { CategoryListQuerySchema } from "./category.filter";
+import { paramsSchema } from "../../../configs/jwt";
+import { authGuard } from "../../../middlewares/auth.middleware";
+import { roleGuard } from "../../../middlewares/role.middlreware";
+import { validateRequest } from "../../../middlewares/validateRequest";
+import { UserRole } from "../../user/user.types";
+import { CategoryListQuerySchema } from "../category.filter";
 import {
   createCategorySchema,
   updateCategorySchema,
-} from "./category.validation";
+} from "../category.validation";
+import { categoryAdminController } from "./category.admin.controller";
 
 const categoryAdminRouter = Router();
 

@@ -1,15 +1,11 @@
 import createHttpError from "http-errors";
-import { buildQueryFilters } from "../../utils/query-builder";
-import {
-  IInstructorProfileDocument,
-  InstructorRequestStatus,
-} from "./profiles/instructor/instructor.types";
-import {
-  instructorRequestsFilterConfig,
-  userFilterConfig,
-} from "./user.filter";
-import { User } from "./user.model";
-import { IUserFilter, UserRole } from "./user.types";
+import { IUserFilter, UserRole } from "../user.types";
+import { buildQueryFilters } from "../../../utils/query-builder";
+import { instructorRequestsFilterConfig, userFilterConfig } from "../user.filter";
+import { User } from "../user.model";
+import { IInstructorProfileDocument, InstructorRequestStatus } from "../profiles/instructor/instructor.types";
+
+
 
 export const adminUserService = {
   async userList(filters: IUserFilter) {

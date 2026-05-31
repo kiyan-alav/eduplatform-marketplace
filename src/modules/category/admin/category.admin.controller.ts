@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { buildApiResponse } from "../../types/apiResponse";
-import { asyncHandler } from "../../utils/asyncHandler";
+import { asyncHandler } from "../../../utils/asyncHandler";
 import { categoryAdminService } from "./category.admin.service";
+import { buildApiResponse } from "../../../types/apiResponse";
 
 export const categoryAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {

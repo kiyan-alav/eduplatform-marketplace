@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import createHttpError from "http-errors";
-import { InstructorProfile } from "./profiles/instructor/instructor.model";
-import { InstructorRequestStatus } from "./profiles/instructor/instructor.types";
-import { StudentProfile } from "./profiles/student/student.model";
-import { User } from "./user.model";
-import { UserRole } from "./user.types";
-import { UpdateProfileInput } from "./user.validation";
+import { InstructorProfile } from "../profiles/instructor/instructor.model";
+import { InstructorRequestStatus } from "../profiles/instructor/instructor.types";
+import { StudentProfile } from "../profiles/student/student.model";
+import { User } from "../user.model";
+import { UserRole } from "../user.types";
+import { UpdateProfileInput } from "../user.validation";
 
 export const userService = {
   async updateProfile(

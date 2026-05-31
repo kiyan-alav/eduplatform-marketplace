@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { ENV } from "../../configs/env";
-import { AuthRequest } from "../../middlewares/auth.middleware";
-import { buildApiResponse } from "../../types/apiResponse";
-import { asyncHandler } from "../../utils/asyncHandler";
+import { ENV } from "../../../configs/env";
+import { AuthRequest } from "../../../middlewares/auth.middleware";
+import { buildApiResponse } from "../../../types/apiResponse";
+import { asyncHandler } from "../../../utils/asyncHandler";
 import { userService } from "./user.service";
 
 export const userController = {

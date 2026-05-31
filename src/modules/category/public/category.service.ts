@@ -1,7 +1,7 @@
-import { buildQueryFilters } from "../../utils/query-builder";
-import { categoryFilterConfig } from "./category.filter";
-import { Category } from "./category.model";
-import { ICategoryFilter } from "./category.types";
+import { buildQueryFilters } from "../../../utils/query-builder";
+import { categoryFilterConfig } from "../category.filter";
+import { Category } from "../category.model";
+import { ICategoryFilter } from "../category.types";
 
 export const categoryService = {
   async getAll(filters: ICategoryFilter) {
