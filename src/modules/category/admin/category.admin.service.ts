@@ -1,10 +1,13 @@
 import createHttpError from "http-errors";
 import slugify from "slugify";
-import { ICategoryFilter, ICreateCategoryRequest, IUpdateCategoryRequest } from "../category.types";
 import { buildQueryFilters } from "../../../utils/query-builder";
 import { categoryFilterConfig } from "../category.filter";
 import { Category } from "../category.model";
-
+import {
+  ICategoryFilter,
+  ICreateCategoryRequest,
+  IUpdateCategoryRequest,
+} from "../category.types";
 
 export const categoryAdminService = {
   async getAll(filters: ICategoryFilter) {
@@ -22,8 +25,6 @@ export const categoryAdminService = {
     const name = data.name.trim();
 
     const rawSlug = data.slug?.trim() || name;
-
-    console.log(data);
 
     const slug = slugify(rawSlug, {
       lower: true,
