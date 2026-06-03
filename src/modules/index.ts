@@ -2,6 +2,7 @@ import { Router } from "express";
 import authRouter from "./auth/auth.routes";
 import categoryAdminRouter from "./category/admin/category.admin.route";
 import categoryRouter from "./category/public/category.route";
+import courseAdminRouter from "./course/admin/course.admin.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
 import userRouter from "./user/me/user.route";
 
@@ -14,5 +15,7 @@ router.use("/admin/user", adminUserRouter);
 
 router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
+
+router.use("/admin/course", courseAdminRouter);
 
 export default router;

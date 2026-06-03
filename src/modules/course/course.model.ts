@@ -32,7 +32,6 @@ const CourseSchema = new Schema<ICourseDocument>(
     level: {
       type: String,
       enum: Object.values(LevelType),
-      default: LevelType.BEGINNER,
       required: [true, "Level must be defined!"],
     },
     category: {
@@ -64,6 +63,7 @@ const CourseSchema = new Schema<ICourseDocument>(
 
 CourseSchema.plugin(mongoosePaginate);
 
+CourseSchema.index({ isPublished: 1, avgRating: -1 });
 CourseSchema.index({ isPublished: 1, createdAt: -1 });
 CourseSchema.index({ isPublished: 1, level: 1, createdAt: -1 });
 CourseSchema.index({ isPublished: 1, category: 1, createdAt: -1 });

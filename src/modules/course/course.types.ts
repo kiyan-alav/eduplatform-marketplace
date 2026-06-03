@@ -36,3 +36,22 @@ export interface ICourse {
 export interface ICourseDocument extends ICourse, Document {}
 
 export interface ICoursePaginateModel extends PaginateModel<ICourseDocument> {}
+
+// ! ─── Request Types ────────────────────────────────────────────
+export interface ICreateCourseRequest {
+  title: string;
+  description: string;
+  instructor: string;
+  price: number;
+  level: LevelType;
+  category: string;
+}
+
+export interface IUpdateCourseRequest {
+  title?: string;
+  description?: string;
+  instructor?: string;
+  price?: number;
+  level?: LevelType;
+  category?: string;
+}
