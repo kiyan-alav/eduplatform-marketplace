@@ -33,7 +33,7 @@ export const courseAdminService = {
     return course;
   },
 
-  async create(data: ICreateCourseRequest) {
+  async create(data: ICreateCourseRequest, cover?: string) {
     const title = data.title.trim();
     const description = data.description.trim();
 
@@ -47,6 +47,7 @@ export const courseAdminService = {
       price: data.price,
       level: data.level,
       category: categoryId,
+      cover: cover || null,
     });
   },
 

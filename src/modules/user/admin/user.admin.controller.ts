@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
+import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import { adminUserService } from "./user.admin.service";
-import { buildApiResponse } from "../../../types/apiResponse";
-
 
 export const adminUserController = {
   users: asyncHandler(async (req: Request, res: Response) => {

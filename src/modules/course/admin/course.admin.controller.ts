@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ENV } from "../../../configs/env";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import { courseAdminService } from "./course.admin.service";
@@ -38,7 +39,11 @@ export const courseAdminController = {
   }),
 
   create: asyncHandler(async (req: Request, res: Response) => {
-    const course = await courseAdminService.create(req.body);
+    const cover = req.file
+      ? `${ENV.BASE_URL}/public/courses/covers`
+      : undefined;
+
+    const course = await courseAdminService.create(req.body, cover);
 
     const response = buildApiResponse({
       success: true,

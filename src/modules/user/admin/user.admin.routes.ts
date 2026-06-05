@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { adminUserController } from "./user.admin.controller";
-import { authGuard } from "../../../middlewares/auth.middleware";
-import { UserRole } from "../user.types";
-import { InstructorRequestQuerySchema, UserListQuerySchema } from "../user.filter";
-import { validateRequest } from "../../../middlewares/validateRequest";
-import { roleGuard } from "../../../middlewares/role.middlreware";
 import { paramsSchema } from "../../../configs/jwt";
-
+import { authGuard } from "../../../middlewares/auth.middleware";
+import { roleGuard } from "../../../middlewares/role.middleware";
+import { validateRequest } from "../../../middlewares/validateRequest";
+import {
+  InstructorRequestQuerySchema,
+  UserListQuerySchema,
+} from "../user.filter";
+import { UserRole } from "../user.types";
+import { adminUserController } from "./user.admin.controller";
 
 const adminUserRouter = Router();
 

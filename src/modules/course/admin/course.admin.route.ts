@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { paramsSchema } from "../../../configs/jwt";
 import { authGuard } from "../../../middlewares/auth.middleware";
-import { roleGuard } from "../../../middlewares/role.middlreware";
+import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
+import { coursesCoverUpload } from "../../../utils/multer";
 import { UserRole } from "../../user/user.types";
 import { CourseListQuerySchema } from "../course.filter";
 import {
@@ -33,6 +34,7 @@ courseAdminRouter.post(
   "/",
   authGuard,
   roleGuard([UserRole.ADMIN]),
+  coursesCoverUpload.single("avatar"),
   validateRequest(createAdminCourseSchema, "body"),
   courseAdminController.create,
 );
