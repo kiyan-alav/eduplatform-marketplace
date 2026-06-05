@@ -5,6 +5,7 @@ import {
   INotificationPaginateModel,
   NotificationType,
 } from "./notification.types";
+import "../user/user.model";
 
 const NotificationSchema = new Schema<INotificationDocument>(
   {

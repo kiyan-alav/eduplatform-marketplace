@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 import paginate from "mongoose-paginate-v2";
+import "../course/course.model";
+import "../user/profiles/student/student.model";
 import {
   IEnrollmentDocument,
   IEnrollmentPaginateModel,
@@ -9,7 +11,7 @@ const enrollmentSchema = new Schema<IEnrollmentDocument>(
   {
     student: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "StudentProfile",
       required: [true, "User is required"],
     },
     course: {

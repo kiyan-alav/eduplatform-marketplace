@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
-import { courseAdminService } from "../admin/course.admin.service";
+import { courseService } from "./course.service";
 
 export const courseController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const courseData = await courseAdminService.getAll(req.query);
+    const courseData = await courseService.getAll(req.query);
 
     const response = buildApiResponse({
       success: true,
@@ -26,7 +26,7 @@ export const courseController = {
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const course = await courseAdminService.getOne(id);
+    const course = await courseService.getOne(id);
 
     const response = buildApiResponse({
       success: true,

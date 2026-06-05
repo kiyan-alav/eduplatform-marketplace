@@ -2,6 +2,8 @@ import { model, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import { updateCourseRating } from "../../utils/updateCourseRating";
 import { IRatingDocument, IRatingPaginateModel } from "./rating.types";
+import "../course/course.model";
+import "../user/user.model";
 
 const RatingSchema = new Schema<IRatingDocument>(
   {

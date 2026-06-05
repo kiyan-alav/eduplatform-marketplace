@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import paginate from "mongoose-paginate-v2";
+import "../chapter/chapter.model";
 import { ILessonDocument, ILessonPaginateModel } from "./lesson.types";
 
 const lessonSchema = new Schema<ILessonDocument>(

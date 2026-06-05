@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import paginate from "mongoose-paginate-v2";
 import { IChapterDocument, IChapterPaginateModel } from "./chapter.types";
+import "../course/course.model"
 
 const chapterSchema = new Schema<IChapterDocument>(
   {

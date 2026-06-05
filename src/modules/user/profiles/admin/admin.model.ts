@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import "../../user.model";
 import {
   IAdminProfileDocument,
   IAdminProfilePaginateModel,

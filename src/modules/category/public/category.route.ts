@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CategoryListQuerySchema } from "../category.filter";
 import { validateRequest } from "../../../middlewares/validateRequest";
+import { CategoryListQuerySchema } from "../category.filter";
 import { categoryController } from "./category.controller";
 
 const categoryRouter = Router();

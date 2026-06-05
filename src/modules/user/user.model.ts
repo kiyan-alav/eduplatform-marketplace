@@ -5,6 +5,9 @@ import {
   IBaseUserPaginateModel,
   UserRole,
 } from "./user.types";
+import "./profiles/admin/admin.model";
+import "./profiles/instructor/instructor.model";
+import "./profiles/student/student.model";
 
 const BaseUserSchema = new Schema<IBaseUserDocument>(
   {

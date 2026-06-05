@@ -18,6 +18,18 @@ export const courseAdminService = {
       courseFilterConfig,
     );
 
+    options.populate = [
+      { path: "category", select: "name" },
+      {
+        path: "instructor",
+        select: "verification.isVerified verification.status _id",
+        populate: {
+          path: "user",
+          select: "fullName email phone _id avatar",
+        }
+      },
+    ];
+
     const result = await Course.paginate(mongoFilter, options);
 
     return result;
@@ -35,7 +47,7 @@ export const courseAdminService = {
 
   async create(data: ICreateCourseRequest, cover?: string) {
     const title = data.title.trim();
-    const description = data.description.trim();
+    const description = data.description?.trim();
 
     const instructorId = new Types.ObjectId(data.instructor);
     const categoryId = new Types.ObjectId(data.category);
@@ -48,10 +60,11 @@ export const courseAdminService = {
       level: data.level,
       category: categoryId,
       cover: cover || null,
+      isPublished: true,
     });
   },
 
-  async edit(id: string, data: IUpdateCourseRequest) {
+  async edit(id: string, data: IUpdateCourseRequest, cover?: string) {
     const course = await Course.findById(id);
 
     if (!course) {
@@ -81,6 +94,8 @@ export const courseAdminService = {
 
     if (data.level) course.level = data.level;
 
+    if (typeof cover === "string") course.cover = cover;
+
     await course.save();
 
     return course;
@@ -104,6 +119,19 @@ export const courseAdminService = {
 
     await Chapter.deleteMany({ course: course._id });
     await course.deleteOne();
+
+    return course;
+  },
+
+  async togglePublish(id: string) {
+    const course = await Course.findById(id);
+
+    if (!course) {
+      throw createHttpError(404, "Course not found!");
+    }
+
+    course.isPublished = !course.isPublished;
+    await course.save();
 
     return course;
   },

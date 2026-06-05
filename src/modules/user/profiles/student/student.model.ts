@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import "../../../course/course.model";
+import "../../user.model";
 import {
   IStudentProfileDocument,
   IStudentProfilePaginateModel,

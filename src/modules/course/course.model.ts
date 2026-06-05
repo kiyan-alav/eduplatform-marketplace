@@ -1,5 +1,7 @@
 import { model, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import "../category/category.model";
+import "../user/profiles/instructor/instructor.model";
 import {
   ICourseDocument,
   ICoursePaginateModel,
@@ -18,10 +20,11 @@ const CourseSchema = new Schema<ICourseDocument>(
       type: String,
       trim: true,
       lowercase: true,
+      default: null,
     },
     instructor: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "InstructorProfile",
       required: [true, "Instructor is required"],
     },
     price: {

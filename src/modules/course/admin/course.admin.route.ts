@@ -34,7 +34,7 @@ courseAdminRouter.post(
   "/",
   authGuard,
   roleGuard([UserRole.ADMIN]),
-  coursesCoverUpload.single("avatar"),
+  coursesCoverUpload.single("cover"),
   validateRequest(createAdminCourseSchema, "body"),
   courseAdminController.create,
 );
@@ -43,6 +43,7 @@ courseAdminRouter.put(
   "/:id",
   authGuard,
   roleGuard([UserRole.ADMIN]),
+  coursesCoverUpload.single("cover"),
   validateRequest(paramsSchema, "params"),
   validateRequest(updateAdminCourseSchema, "body"),
   courseAdminController.edit,
@@ -54,6 +55,14 @@ courseAdminRouter.delete(
   roleGuard([UserRole.ADMIN]),
   validateRequest(paramsSchema, "params"),
   courseAdminController.delete,
+);
+
+courseAdminRouter.patch(
+  "/:id/publish",
+  authGuard,
+  roleGuard([UserRole.ADMIN]),
+  validateRequest(paramsSchema, "params"),
+  courseAdminController.togglePublish,
 );
 
 export default courseAdminRouter;

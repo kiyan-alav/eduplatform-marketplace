@@ -40,7 +40,7 @@ export const courseAdminController = {
 
   create: asyncHandler(async (req: Request, res: Response) => {
     const cover = req.file
-      ? `${ENV.BASE_URL}/public/courses/covers`
+      ? `${ENV.BASE_URL}/public/courses/covers/${req.file.filename}`
       : undefined;
 
     const course = await courseAdminService.create(req.body, cover);
@@ -56,7 +56,12 @@ export const courseAdminController = {
 
   edit: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const course = await courseAdminService.edit(id, req.body);
+
+    const cover = req.file
+      ? `${ENV.BASE_URL}/public/courses/covers/${req.file.filename}`
+      : undefined;
+
+    const course = await courseAdminService.edit(id, req.body, cover);
 
     const response = buildApiResponse({
       success: true,
@@ -74,6 +79,19 @@ export const courseAdminController = {
     const response = buildApiResponse({
       success: true,
       message: "Course deleted successfully!",
+      data: course,
+    });
+
+    return res.status(200).json(response);
+  }),
+
+  togglePublish: asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    const course = await courseAdminService.togglePublish(id);
+
+    const response = buildApiResponse({
+      success: true,
+      message: "Course publish status updated successfully!",
       data: course,
     });
 

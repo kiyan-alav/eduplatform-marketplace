@@ -1,5 +1,7 @@
 import { Document, model, PaginateModel, Schema, Types } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import "../user/user.model";
+
 
 export interface IRefreshToken {
   user: Types.ObjectId;

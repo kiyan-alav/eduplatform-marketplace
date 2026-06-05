@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
-import { Course } from "../course.model";
-import { ICourseFilter } from "../course.types";
 import { buildQueryFilters } from "../../../utils/query-builder";
 import { courseFilterConfig } from "../course.filter";
+import { Course } from "../course.model";
+import { ICourseFilter } from "../course.types";
 
 export const courseService = {
   async getAll(filters: ICourseFilter) {
@@ -10,6 +10,8 @@ export const courseService = {
       filters,
       courseFilterConfig,
     );
+
+    mongoFilter.isPublished = true;
 
     const result = await Course.paginate(mongoFilter, options);
 
