@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { buildQueryFilters } from "../../../utils/query-builder";
 import { Chapter } from "../../chapter/chapter.model";
 import { Lesson } from "../../lesson/lesson.model";
+import { InstructorProfile } from "../../user/profiles/instructor/instructor.model";
 import { courseFilterConfig } from "../course.filter";
 import { Course } from "../course.model";
 import {
@@ -12,22 +13,76 @@ import {
 } from "../course.types";
 
 export const courseUserService = {
-  async getAll(filters: ICourseFilter) {
+  async getAll(filters: ICourseFilter, userId?: string) {
     const { mongoFilter, options } = buildQueryFilters(
       filters,
       courseFilterConfig,
     );
+
+    if (userId) {
+      const instructor = await InstructorProfile.findOne({
+        user: userId,
+      }).select("_id");
+
+      if (!instructor) {
+        throw createHttpError(404, "Instructor not found!");
+      }
+
+      mongoFilter.instructor = instructor._id;
+    }
+
+    options.populate = [
+      { path: "category", select: "name" },
+      {
+        path: "instructor",
+        select: "verification.isVerified verification.status _id",
+        populate: {
+          path: "user",
+          select: "fullName email phone _id avatar",
+        },
+      },
+    ];
 
     const result = await Course.paginate(mongoFilter, options);
 
     return result;
   },
 
-  async getOne(id: string) {
-    const course = await Course.findById(id);
+  async getOne(id: string, userId?: string) {
+    const course = await Course.findById(id).populate([
+      { path: "category", select: "-createdAt -updatedAt -__v" },
+      {
+        path: "instructor",
+        select: "-createdAt -updatedAt -__v",
+        populate: {
+          path: "user",
+          select: "-createdAt -updatedAt -__v",
+        },
+      },
+    ]);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
+    }
+
+    if (userId) {
+      const instructor = await InstructorProfile.findOne({
+        user: userId,
+      }).select("_id");
+
+      if (!instructor) {
+        throw createHttpError(
+          403,
+          "You are not authorized to access this course!",
+        );
+      }
+
+      if (course.instructor._id.toString() !== instructor._id.toString()) {
+        throw createHttpError(
+          403,
+          "You are not authorized to access this course!",
+        );
+      }
     }
 
     return course;
@@ -37,8 +92,33 @@ export const courseUserService = {
     const title = data.title.trim();
     const description = data.description?.trim();
 
-    const instructorId = new Types.ObjectId(data.instructor);
+    const instructorProfile = await InstructorProfile.findOne({
+      user: data.instructor,
+    }).select("_id");
+
+    if (!instructorProfile) {
+      throw createHttpError(
+        403,
+        "You are not authorized to create courses. You must be an instructor.",
+      );
+    }
+
+    const instructorId = instructorProfile._id;
+
     const categoryId = new Types.ObjectId(data.category);
+
+    if (data.instructor) {
+      const otherInstructorProfile = await InstructorProfile.findOne({
+        user: data.instructor,
+      }).select("_id");
+      if (!otherInstructorProfile) {
+        throw createHttpError(
+          400,
+          "Instructor not found for the specified user.",
+        );
+      }
+      throw createHttpError(403, "You can only create courses for yourself.");
+    }
 
     return await Course.create({
       title,
@@ -68,13 +148,6 @@ export const courseUserService = {
         throw createHttpError(400, "Invalid category id");
       }
       course.category = new Types.ObjectId(data.category);
-    }
-
-    if (typeof data.instructor === "string") {
-      if (!Types.ObjectId.isValid(data.instructor)) {
-        throw createHttpError(400, "Invalid instructor id");
-      }
-      course.instructor = new Types.ObjectId(data.instructor);
     }
 
     if (data.price !== undefined) course.price = data.price;

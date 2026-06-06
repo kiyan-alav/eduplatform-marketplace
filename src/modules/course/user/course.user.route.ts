@@ -20,7 +20,7 @@ const courseUserRouter = Router();
 courseUserRouter.get(
   "/list",
   authGuard,
-  roleGuard([UserRole.ADMIN]),
+  roleGuard([UserRole.INSTRUCTOR]),
   validateRequest(CourseListQuerySchema, "query"),
   courseUserController.getAll,
 );
@@ -28,7 +28,7 @@ courseUserRouter.get(
 courseUserRouter.get(
   "/:id",
   authGuard,
-  roleGuard([UserRole.ADMIN]),
+  roleGuard([UserRole.INSTRUCTOR]),
   validateRequest(paramsSchema, "params"),
   courseUserController.getOne,
 );
@@ -59,3 +59,5 @@ courseUserRouter.delete(
   validateRequest(paramsSchema, "params"),
   courseUserController.delete,
 );
+
+export default courseUserRouter;

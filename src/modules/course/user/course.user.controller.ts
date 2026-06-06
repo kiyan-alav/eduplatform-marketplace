@@ -6,8 +6,10 @@ import { asyncHandler } from "../../../utils/asyncHandler";
 import { courseUserService } from "./course.user.service";
 
 export const courseUserController = {
-  getAll: asyncHandler(async (req: Request, res: Response) => {
-    const courseData = await courseUserService.getAll(req.query);
+  getAll: asyncHandler(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+
+    const courseData = await courseUserService.getAll(req.query, userId);
 
     const response = buildApiResponse({
       success: true,
@@ -26,9 +28,11 @@ export const courseUserController = {
     return res.status(200).json(response);
   }),
 
-  getOne: asyncHandler(async (req: Request, res: Response) => {
+  getOne: asyncHandler(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+
     const id = req.params.id as string;
-    const course = await courseUserService.getOne(id);
+    const course = await courseUserService.getOne(id, userId);
 
     const response = buildApiResponse({
       success: true,

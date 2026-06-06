@@ -4,6 +4,7 @@ import categoryAdminRouter from "./category/admin/category.admin.route";
 import categoryRouter from "./category/public/category.route";
 import courseAdminRouter from "./course/admin/course.admin.route";
 import courseRouter from "./course/public/course.route";
+import courseUserRouter from "./course/user/course.user.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
 import userRouter from "./user/me/user.route";
 
@@ -18,6 +19,7 @@ router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
 
 router.use("/course", courseRouter);
+router.use("/course/instructor", courseUserRouter);
 router.use("/admin/course", courseAdminRouter);
 
 export default router;

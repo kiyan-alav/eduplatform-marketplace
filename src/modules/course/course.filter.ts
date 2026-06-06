@@ -4,9 +4,9 @@ import { FilterConfig } from "../../utils/query-builder";
 import { ICourseFilter, LevelType } from "./course.types";
 
 export const courseFilterConfig: FilterConfig<ICourseFilter> = {
-  searchable: ["title", "instructor", "category"],
-  regex: ["title", "instructor", "category"],
-  exact: ["level", "isPublished"],
+  searchable: ["title"],
+  regex: ["title"],
+  exact: ["level", "isPublished", "instructor", "category"],
   enumList: [],
 };
 
@@ -17,5 +17,5 @@ export const CourseListQuerySchema = PaginationSchema.extend({
   level: z
     .enum([LevelType.BEGINNER, LevelType.INTERMEDIATE, LevelType.ADVANCED])
     .optional(),
-  isPublished: z.boolean().optional(),
+  isPublished: z.coerce.boolean().optional(),
 });

@@ -26,7 +26,7 @@ export const courseAdminService = {
         populate: {
           path: "user",
           select: "fullName email phone _id avatar",
-        }
+        },
       },
     ];
 
@@ -36,7 +36,17 @@ export const courseAdminService = {
   },
 
   async getOne(id: string) {
-    const course = await Course.findById(id);
+    const course = await Course.findById(id).populate([
+      { path: "category", select: "-createdAt -updatedAt -__v" },
+      {
+        path: "instructor",
+        select: "-createdAt -updatedAt -__v",
+        populate: {
+          path: "user",
+          select: "-createdAt -updatedAt -__v",
+        },
+      },
+    ]);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
