@@ -2,6 +2,9 @@ import { Router } from "express";
 import authRouter from "./auth/auth.routes";
 import categoryAdminRouter from "./category/admin/category.admin.route";
 import categoryRouter from "./category/public/category.route";
+import adminChapterRouter from "./chapter/admin/chapter.admin.route";
+import chapterRouter from "./chapter/public/chapter.route";
+import chapterUserRouter from "./chapter/user/chapter.user.route";
 import courseAdminRouter from "./course/admin/course.admin.route";
 import courseRouter from "./course/public/course.route";
 import courseUserRouter from "./course/user/course.user.route";
@@ -17,6 +20,10 @@ router.use("/admin/user", adminUserRouter);
 
 router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
+
+router.use("/chapter", chapterRouter);
+router.use("/chapter/instructor", chapterUserRouter);
+router.use("/admin/chapter", adminChapterRouter);
 
 router.use("/course", courseRouter);
 router.use("/course/instructor", courseUserRouter);
