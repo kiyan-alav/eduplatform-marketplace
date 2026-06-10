@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
-import { chapterAdminService } from "./chapter.admin.service";
+import { lessonAdminService } from "./lesson.admin.service";
 
-export const chapterAdminController = {
+export const lessonAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const chapterData = await chapterAdminService.getAll(req.query);
+    const lessonData = await lessonAdminService.getAll(req.query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: chapterData.docs,
+      data: lessonData.docs,
       meta: {
-        limit: chapterData.limit,
-        page: chapterData.page as number,
-        total: chapterData.totalDocs,
-        totalPages: chapterData.totalPages,
-        hasNextPage: chapterData.hasNextPage,
-        hasPrevPage: chapterData.hasPrevPage,
+        limit: lessonData.limit,
+        page: lessonData.page as number,
+        total: lessonData.totalDocs,
+        totalPages: lessonData.totalPages,
+        hasNextPage: lessonData.hasNextPage,
+        hasPrevPage: lessonData.hasPrevPage,
       },
     });
 
@@ -26,24 +26,24 @@ export const chapterAdminController = {
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const chapter = await chapterAdminService.getOne(id);
+    const lesson = await lessonAdminService.getOne(id);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: chapter,
+      data: lesson,
     });
 
     return res.status(200).json(response);
   }),
 
   create: asyncHandler(async (req: Request, res: Response) => {
-    const chapter = await chapterAdminService.create(req.body);
+    const lesson = await lessonAdminService.create(req.body);
 
     const response = buildApiResponse({
       success: true,
-      message: "Chapter created successfully!",
-      data: chapter,
+      message: "Lesson created successfully!",
+      data: lesson,
     });
 
     return res.status(201).json(response);
@@ -51,12 +51,12 @@ export const chapterAdminController = {
 
   edit: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const chapter = await chapterAdminService.edit(id, req.body);
+    const lesson = await lessonAdminService.edit(id, req.body);
 
     const response = buildApiResponse({
       success: true,
-      message: "Chapter updated successfully!",
-      data: chapter,
+      message: "Lesson updated successfully!",
+      data: lesson,
     });
 
     return res.status(200).json(response);
@@ -64,12 +64,12 @@ export const chapterAdminController = {
 
   delete: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const chapter = await chapterAdminService.delete(id);
+    const lesson = await lessonAdminService.delete(id);
 
     const response = buildApiResponse({
       success: true,
-      message: "Chapter deleted successfully!",
-      data: chapter,
+      message: "Lesson deleted successfully!",
+      data: lesson,
     });
 
     return res.status(200).json(response);

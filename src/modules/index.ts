@@ -8,10 +8,13 @@ import chapterUserRouter from "./chapter/user/chapter.user.route";
 import courseAdminRouter from "./course/admin/course.admin.route";
 import courseRouter from "./course/public/course.route";
 import courseUserRouter from "./course/user/course.user.route";
+import lessonAdminRouter from "./lesson/admin/lesson.admin.route";
+import lessonRouter from "./lesson/public/lesson.route";
+import lessonUserRouter from "./lesson/user/lesson.user.route";
 import ratingRouter from "./rating/public/rating.route";
+import ratingUserRouter from "./rating/user/rating.user.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
 import userRouter from "./user/me/user.route";
-import ratingUserRouter from "./rating/user/rating.user.route";
 
 const router = Router();
 
@@ -22,6 +25,10 @@ router.use("/admin/user", adminUserRouter);
 
 router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
+
+router.use("/lesson", lessonRouter);
+router.use("/lesson/instructor", lessonUserRouter);
+router.use("/admin/lesson", lessonAdminRouter);
 
 router.use("/chapter", chapterRouter);
 router.use("/chapter/instructor", chapterUserRouter);

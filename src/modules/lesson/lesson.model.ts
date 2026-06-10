@@ -20,11 +20,11 @@ const lessonSchema = new Schema<ILessonDocument>(
       type: Number,
       required: [true, "Duration is required"],
     },
-    videoPath: {
-      type: String,
-      default: null,
-      trim: true,
-    },
+    // videoPath: {
+    //   type: String,
+    //   default: null,
+    //   trim: true,
+    // },
     order: {
       type: Number,
       required: [true, "Order value is required"],
