@@ -1,10 +1,10 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import { chapterService } from "./chapter.service";
 
 export const chapterController = {
-  getAll: asyncHandler(async (req: Request, res) => {
+  getAll: asyncHandler(async (req: Request, res: Response) => {
     const chapterData = await chapterService.getAll(req.query);
 
     const response = buildApiResponse({
@@ -24,7 +24,7 @@ export const chapterController = {
     return res.status(200).json(response);
   }),
 
-  getOne: asyncHandler(async (req: Request, res) => {
+  getOne: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const chapter = await chapterService.getOne(id);
 

@@ -8,8 +8,10 @@ import chapterUserRouter from "./chapter/user/chapter.user.route";
 import courseAdminRouter from "./course/admin/course.admin.route";
 import courseRouter from "./course/public/course.route";
 import courseUserRouter from "./course/user/course.user.route";
+import ratingRouter from "./rating/public/rating.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
 import userRouter from "./user/me/user.route";
+import ratingUserRouter from "./rating/user/rating.user.route";
 
 const router = Router();
 
@@ -28,5 +30,8 @@ router.use("/admin/chapter", adminChapterRouter);
 router.use("/course", courseRouter);
 router.use("/course/instructor", courseUserRouter);
 router.use("/admin/course", courseAdminRouter);
+
+router.use("/rating", ratingRouter);
+router.use("/rating/user", ratingUserRouter);
 
 export default router;

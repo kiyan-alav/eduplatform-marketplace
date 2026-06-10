@@ -28,6 +28,10 @@ const RatingSchema = new Schema<IRatingDocument>(
       trim: true,
       lowercase: true,
     },
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

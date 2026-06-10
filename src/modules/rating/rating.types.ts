@@ -1,10 +1,4 @@
 import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
-
-// ! ─── Filter Types ────────────────────────────────────────────
-export interface IRatingFilter extends CustomQueryOptions {
-  course?: string;
-}
 
 // ! ─── Core Types ────────────────────────────────────────────
 export interface IRating {
@@ -12,6 +6,7 @@ export interface IRating {
   course: Types.ObjectId;
   score: number;
   description: string;
+  isApproved: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -19,3 +14,11 @@ export interface IRating {
 export interface IRatingDocument extends IRating, Document {}
 
 export interface IRatingPaginateModel extends PaginateModel<IRatingDocument> {}
+
+// ! ─── Request Types ────────────────────────────────────────────
+export interface ICreateRatingRequest {
+  user: string;
+  course: string;
+  score: number;
+  description?: string;
+}
