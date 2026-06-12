@@ -12,6 +12,7 @@ import lessonAdminRouter from "./lesson/admin/lesson.admin.route";
 import lessonRouter from "./lesson/public/lesson.route";
 import lessonUserRouter from "./lesson/user/lesson.user.route";
 import notificationRouter from "./notification/notification.route";
+import ratingAdminRouter from "./rating/admin/rating.admin.route";
 import ratingRouter from "./rating/public/rating.route";
 import ratingUserRouter from "./rating/user/rating.user.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
@@ -41,6 +42,7 @@ router.use("/course/instructor", courseUserRouter);
 router.use("/admin/course", courseAdminRouter);
 
 router.use("/rating", ratingRouter);
-router.use("/rating/user", ratingUserRouter);
+router.use("/user/rating", ratingUserRouter);
+router.use("/admin/rating", ratingAdminRouter);
 
 export default router;

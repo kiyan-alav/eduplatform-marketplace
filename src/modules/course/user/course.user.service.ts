@@ -3,6 +3,8 @@ import { Types } from "mongoose";
 import { buildQueryFilters } from "../../../utils/query-builder";
 import { Chapter } from "../../chapter/chapter.model";
 import { Lesson } from "../../lesson/lesson.model";
+import { notificationService } from "../../notification/notification.service";
+import { NotificationType } from "../../notification/notification.types";
 import { InstructorProfile } from "../../user/profiles/instructor/instructor.model";
 import { courseFilterConfig } from "../course.filter";
 import { Course } from "../course.model";
@@ -119,6 +121,14 @@ export const courseUserService = {
       }
       throw createHttpError(403, "You can only create courses for yourself.");
     }
+
+    await notificationService.create({
+      user: instructorId.toString(),
+      title: "Your course has been created",
+      description:
+        "After review, your course will be published and available for students.",
+      type: NotificationType.SUCCESS,
+    });
 
     return await Course.create({
       title,

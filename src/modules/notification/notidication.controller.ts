@@ -25,7 +25,7 @@ export const notificationController = {
       },
     });
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }),
 
   getUnreadCount: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -39,7 +39,7 @@ export const notificationController = {
       data: { unreadCount },
     });
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }),
 
   markAsRead: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -55,7 +55,7 @@ export const notificationController = {
       data: notification,
     });
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }),
 
   markAllAsRead: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -69,6 +69,6 @@ export const notificationController = {
       data: notifications,
     });
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }),
 };

@@ -1,4 +1,10 @@
 import { Document, PaginateModel, Types } from "mongoose";
+import { CustomQueryOptions } from "../../utils/query-builder";
+
+// ! ─── Filter Types ────────────────────────────────────────────
+export interface IRatingFilter extends CustomQueryOptions {
+  isApproved?: boolean;
+}
 
 // ! ─── Core Types ────────────────────────────────────────────
 export interface IRating {

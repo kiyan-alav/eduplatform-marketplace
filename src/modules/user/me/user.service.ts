@@ -6,6 +6,8 @@ import { StudentProfile } from "../profiles/student/student.model";
 import { User } from "../user.model";
 import { UserRole } from "../user.types";
 import { UpdateProfileInput } from "../user.validation";
+import { notificationService } from "../../notification/notification.service";
+import { NotificationType } from "../../notification/notification.types";
 
 export const userService = {
   async updateProfile(
@@ -107,6 +109,14 @@ export const userService = {
     }
 
     await user.save();
+
+    await notificationService.create({
+      user: user._id.toString(),
+      title: "Your request has been submitted",
+      description:
+        "After review, your instructor application will be approved or rejected. You will receive a notification once the review is complete.",
+      type: NotificationType.SUCCESS,
+    });
 
     return instructorProfile;
   },
