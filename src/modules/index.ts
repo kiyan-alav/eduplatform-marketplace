@@ -11,6 +11,7 @@ import courseUserRouter from "./course/user/course.user.route";
 import lessonAdminRouter from "./lesson/admin/lesson.admin.route";
 import lessonRouter from "./lesson/public/lesson.route";
 import lessonUserRouter from "./lesson/user/lesson.user.route";
+import notificationRouter from "./notification/notification.route";
 import ratingRouter from "./rating/public/rating.route";
 import ratingUserRouter from "./rating/user/rating.user.route";
 import adminUserRouter from "./user/admin/user.admin.routes";
@@ -21,6 +22,7 @@ const router = Router();
 router.use("/auth", authRouter);
 
 router.use("/user", userRouter);
+router.use("/user/notification", notificationRouter);
 router.use("/admin/user", adminUserRouter);
 
 router.use("/category", categoryRouter);
