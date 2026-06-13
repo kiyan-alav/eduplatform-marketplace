@@ -1,33 +1,35 @@
 import { z } from "zod";
 
-export const updateProfileSchema = z.object({
-  fullName: z.string().optional(),
-  studentProfile: z
-    .object({
-      interests: z.array(z.string()).optional(),
-    })
-    .optional(),
-  instructorProfile: z
-    .object({
-      bio: z.string().max(1000).optional(),
-      expertise: z.array(z.string()).optional(),
-      socialLinks: z
-        .object({
-          website: z.url().optional(),
-          instagram: z.string().optional(),
-          linkedin: z.string().optional(),
-        })
-        .optional(),
-      payoutInfo: z
-        .object({
-          bankAccount: z.string().optional(),
-          cardNumber: z.string().optional(),
-          sheba: z.string().optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-});
+export const updateProfileSchema = z
+  .object({
+    fullName: z.string().optional(),
+    studentProfile: z
+      .object({
+        interests: z.array(z.string()).optional(),
+      })
+      .optional(),
+    instructorProfile: z
+      .object({
+        bio: z.string().max(1000).optional(),
+        expertise: z.array(z.string()).optional(),
+        socialLinks: z
+          .object({
+            website: z.url().optional(),
+            instagram: z.string().optional(),
+            linkedin: z.string().optional(),
+          })
+          .optional(),
+        payoutInfo: z
+          .object({
+            bankAccount: z.string().optional(),
+            cardNumber: z.string().optional(),
+            sheba: z.string().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+  })
+  .strict();
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
@@ -42,4 +44,5 @@ export const updatePasswordSchema = z
   .refine((data) => data.newPassword === data.confirmNewPassword, {
     error: "Password do not match",
     path: ["confirmNewPassword"],
-  });
+  })
+  .strict();

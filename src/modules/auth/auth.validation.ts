@@ -15,22 +15,25 @@ export const registerSchema = z
   .refine((data) => data.password === data.confirm, {
     error: "Passwords do not match",
     path: ["confirm"],
-  });
+  })
+  .strict();
 
-export const loginSchema = z.object({
-  identifier: z
-    .string()
-    .min(1, "Identifier is required")
-    .refine(
-      (value) => {
-        const isEmail = z.email().safeParse(value).success;
-        const isPhone = phoneRegex.test(value);
+export const loginSchema = z
+  .object({
+    identifier: z
+      .string()
+      .min(1, "Identifier is required")
+      .refine(
+        (value) => {
+          const isEmail = z.email().safeParse(value).success;
+          const isPhone = phoneRegex.test(value);
 
-        return isEmail || isPhone;
-      },
-      {
-        message: "Identifier must be a valid email or phone number",
-      },
-    ),
-  password: z.string("Password is required"),
-});
+          return isEmail || isPhone;
+        },
+        {
+          message: "Identifier must be a valid email or phone number",
+        },
+      ),
+    password: z.string("Password is required"),
+  })
+  .strict();

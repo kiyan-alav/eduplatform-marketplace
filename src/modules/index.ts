@@ -8,6 +8,8 @@ import chapterUserRouter from "./chapter/user/chapter.user.route";
 import courseAdminRouter from "./course/admin/course.admin.route";
 import courseRouter from "./course/public/course.route";
 import courseUserRouter from "./course/user/course.user.route";
+import adminEnrollmentRouter from "./enrollment/admin/enrollment.admin.route";
+import userEnrollmentRouter from "./enrollment/user/enrollment.user.route";
 import lessonAdminRouter from "./lesson/admin/lesson.admin.route";
 import lessonRouter from "./lesson/public/lesson.route";
 import lessonUserRouter from "./lesson/user/lesson.user.route";
@@ -30,19 +32,21 @@ router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
 
 router.use("/lesson", lessonRouter);
-router.use("/lesson/instructor", lessonUserRouter);
+router.use("/instructor/lesson", lessonUserRouter);
 router.use("/admin/lesson", lessonAdminRouter);
 
 router.use("/chapter", chapterRouter);
-router.use("/chapter/instructor", chapterUserRouter);
+router.use("/instructor/chapter", chapterUserRouter);
 router.use("/admin/chapter", adminChapterRouter);
 
 router.use("/course", courseRouter);
-router.use("/course/instructor", courseUserRouter);
+router.use("/instructor/course", courseUserRouter);
 router.use("/admin/course", courseAdminRouter);
 
 router.use("/rating", ratingRouter);
 router.use("/user/rating", ratingUserRouter);
 router.use("/admin/rating", ratingAdminRouter);
+router.use("/student/enrollment", userEnrollmentRouter);
+router.use("/admin/enrollment", adminEnrollmentRouter);
 
 export default router;
