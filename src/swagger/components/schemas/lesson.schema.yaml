@@ -1,0 +1,39 @@
+components:
+  schemas:
+    CreateLesson:
+      type: object
+      required:
+        - title
+        - chapter
+        - order
+        - duration
+      properties:
+        title:
+          type: string
+          example: Lesson 1
+        chapter:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        order:
+          type: integer
+          minimum: 1
+          example: 1
+        duration:
+          type: integer
+          minimum: 1
+          description: Duration in seconds
+          example: 600
+
+    UpdateLesson:
+      type: object
+      properties:
+        title:
+          type: string
+        chapter:
+          type: string
+        order:
+          type: integer
+          minimum: 1
+        duration:
+          type: integer
+          minimum: 1

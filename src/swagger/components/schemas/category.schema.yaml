@@ -1,0 +1,21 @@
+components:
+  schemas:
+    CreateCategory:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Programming
+        slug:
+          type: string
+          example: programming
+
+    UpdateCategory:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string

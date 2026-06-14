@@ -1,0 +1,102 @@
+components:
+  schemas:
+    LevelType:
+      type: string
+      enum:
+        - BEGINNER
+        - INTERMEDIATE
+        - ADVANCED
+
+    CreateAdminCourse:
+      type: object
+      required:
+        - title
+        - instructor
+        - price
+        - level
+        - category
+      properties:
+        title:
+          type: string
+          example: Node.js Mastery
+        description:
+          type: string
+          example: Complete backend course
+        instructor:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        price:
+          type: number
+          minimum: 0
+          example: 99
+        level:
+          $ref: "#/components/schemas/LevelType"
+        category:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        cover:
+          type: string
+          format: binary
+
+    UpdateAdminCourse:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        instructor:
+          type: string
+        price:
+          type: number
+        level:
+          $ref: "#/components/schemas/LevelType"
+        category:
+          type: string
+        cover:
+          type: string
+          format: binary
+
+    CreateInstructorCourse:
+      type: object
+      required:
+        - title
+        - price
+        - level
+        - category
+      properties:
+        title:
+          type: string
+          example: Node.js Mastery
+        description:
+          type: string
+          example: Complete backend course
+        price:
+          type: number
+          minimum: 0
+          example: 99
+        level:
+          $ref: "#/components/schemas/LevelType"
+        category:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        cover:
+          type: string
+          format: binary
+
+    UpdateInstructorCourse:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        level:
+          $ref: "#/components/schemas/LevelType"
+        category:
+          type: string
+        cover:
+          type: string
+          format: binary

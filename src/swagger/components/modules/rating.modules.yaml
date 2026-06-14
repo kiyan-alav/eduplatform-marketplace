@@ -1,0 +1,104 @@
+paths:
+  /rating/{id}/list:
+    get:
+      tags:
+        - Rating
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /user/rating/create:
+    post:
+      tags:
+        - User Rating
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRating"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+
+  /user/rating/{id}/delete:
+    delete:
+      tags:
+        - User Rating
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /admin/rating/list:
+    get:
+      tags:
+        - Admin Rating
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: isApproved
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+        "403":
+          $ref: "#/components/responses/NotAllowed"
+
+  /admin/rating/{id}:
+    delete:
+      tags:
+        - Admin Rating
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+        "403":
+          $ref: "#/components/responses/NotAllowed"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /admin/rating/{id}/toggle-visibility:
+    patch:
+      tags:
+        - Admin Rating
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+        "403":
+          $ref: "#/components/responses/NotAllowed"
+        "404":
+          $ref: "#/components/responses/NotFound"

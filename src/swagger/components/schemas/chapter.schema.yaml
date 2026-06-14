@@ -1,0 +1,30 @@
+components:
+  schemas:
+    CreateChapter:
+      type: object
+      required:
+        - title
+        - course
+        - order
+      properties:
+        title:
+          type: string
+          example: Introduction
+        course:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        order:
+          type: integer
+          minimum: 1
+          example: 1
+
+    UpdateChapter:
+      type: object
+      properties:
+        title:
+          type: string
+        course:
+          type: string
+        order:
+          type: integer
+          minimum: 1

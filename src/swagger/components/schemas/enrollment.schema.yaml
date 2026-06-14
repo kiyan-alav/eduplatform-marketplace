@@ -1,0 +1,19 @@
+components:
+  schemas:
+    CreateEnrollment:
+      type: object
+      required:
+        - course
+      properties:
+        student:
+          type: string
+          description: Optional in request body, overwritten from auth user
+        course:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        paid:
+          type: number
+          example: 99
+        paidAt:
+          type: string
+          format: date-time

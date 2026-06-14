@@ -1,0 +1,8 @@
+components:
+  schemas:
+    UserRole:
+      type: string
+      enum:
+        - ADMIN
+        - INSTRUCTOR
+        - STUDENT

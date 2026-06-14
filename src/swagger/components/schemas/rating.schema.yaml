@@ -1,0 +1,22 @@
+components:
+  schemas:
+    CreateRating:
+      type: object
+      required:
+        - course
+        - score
+      properties:
+        course:
+          type: string
+          example: 66ef1203b9e0421ff0e9d2e1
+        userId:
+          type: string
+          description: Ignored by API, user is taken from auth token
+        score:
+          type: number
+          minimum: 1
+          maximum: 5
+          example: 5
+        description:
+          type: string
+          example: Great course

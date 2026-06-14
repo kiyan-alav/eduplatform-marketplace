@@ -13,8 +13,6 @@ export const makeUploader = (
   const __dirname = path.resolve();
   const uploadDir = path.join(__dirname, "public", folder);
 
-  logger.info(uploadDir);
-
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }

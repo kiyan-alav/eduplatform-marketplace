@@ -1,0 +1,241 @@
+paths:
+  /course/list:
+    get:
+      tags:
+        - Course
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: instructor
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            $ref: "#/components/schemas/LevelType"
+        - name: isPublished
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /course/{id}:
+    get:
+      tags:
+        - Course
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /instructor/course/list:
+    get:
+      tags:
+        - Instructor Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: instructor
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            $ref: "#/components/schemas/LevelType"
+        - name: isPublished
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /instructor/course/{id}:
+    get:
+      tags:
+        - Instructor Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    put:
+      tags:
+        - Instructor Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateInstructorCourse"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    delete:
+      tags:
+        - Instructor Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /instructor/course:
+    post:
+      tags:
+        - Instructor Course
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateInstructorCourse"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /admin/course/list:
+    get:
+      tags:
+        - Admin Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: instructor
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            $ref: "#/components/schemas/LevelType"
+        - name: isPublished
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /admin/course/{id}:
+    get:
+      tags:
+        - Admin Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    put:
+      tags:
+        - Admin Course
+      summary: Update admin course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateAdminCourse"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    delete:
+      tags:
+        - Admin Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /admin/course:
+    post:
+      tags:
+        - Admin Course
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateAdminCourse"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /admin/course/{id}/publish:
+    patch:
+      tags:
+        - Admin Course
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"

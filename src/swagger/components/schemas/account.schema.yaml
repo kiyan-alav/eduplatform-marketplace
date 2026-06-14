@@ -1,0 +1,74 @@
+components:
+  schemas:
+    UpdateProfile:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        studentProfile:
+          type: object
+          properties:
+            interests:
+              type: array
+              items:
+                type: string
+        instructorProfile:
+          type: object
+          properties:
+            bio:
+              type: string
+            expertise:
+              type: array
+              items:
+                type: string
+            socialLinks:
+              type: object
+              properties:
+                website:
+                  type: string
+                  format: uri
+                instagram:
+                  type: string
+                linkedin:
+                  type: string
+            payoutInfo:
+              type: object
+              properties:
+                bankAccount:
+                  type: string
+                cardNumber:
+                  type: string
+                sheba:
+                  type: string
+        avatar:
+          type: string
+          format: binary
+
+    ChangePassword:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+        - confirmNewPassword
+      properties:
+        currentPassword:
+          type: string
+          format: password
+        newPassword:
+          type: string
+          format: password
+          minLength: 6
+        confirmNewPassword:
+          type: string
+          format: password
+          minLength: 6
+
+    ApplyToInstructor:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: string
+            format: binary

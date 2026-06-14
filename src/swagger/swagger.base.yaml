@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info:
+  title: EduPlatform Marketplace API
+  version: 1.0.0
+  description: Main API documentation
+servers:
+  - url: http://localhost:5000/api
+    description: Local server
+tags:
+  - name: Auth
+  - name: User
+  - name: User Notification
+  - name: Admin User
+  - name: Category
+  - name: Admin Category
+  - name: Chapter
+  - name: Instructor Chapter
+  - name: Admin Chapter
+  - name: Lesson
+  - name: Instructor Lesson
+  - name: Admin Lesson
+  - name: Course
+  - name: Instructor Course
+  - name: Admin Course
+  - name: Student Enrollment
+  - name: Admin Enrollment
+  - name: Rating
+  - name: User Rating
+  - name: Admin Rating
+paths: {}

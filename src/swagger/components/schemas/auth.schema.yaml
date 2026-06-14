@@ -1,0 +1,49 @@
+components:
+  schemas:
+    RegisterUser:
+      type: object
+      required:
+        - email
+        - phone
+        - fullName
+        - password
+        - confirm
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        phone:
+          type: string
+          example: "09123456789"
+        fullName:
+          type: string
+          example: John Doe
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: "123456"
+        confirm:
+          type: string
+          format: password
+          minLength: 6
+          example: "123456"
+        avatar:
+          type: string
+          format: binary
+
+    LoginUser:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: email or phone
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: "123456"

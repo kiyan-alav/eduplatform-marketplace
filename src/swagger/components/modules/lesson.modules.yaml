@@ -1,0 +1,207 @@
+paths:
+  /lesson/list:
+    get:
+      tags:
+        - Lesson
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: chapter
+          in: query
+          schema:
+            type: string
+        - name: course
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /lesson/{id}:
+    get:
+      tags:
+        - Lesson
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /instructor/lesson/list:
+    get:
+      tags:
+        - Instructor Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: chapter
+          in: query
+          schema:
+            type: string
+        - name: course
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/UnAuthorized"
+
+  /instructor/lesson/{id}:
+    get:
+      tags:
+        - Instructor Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    put:
+      tags:
+        - Instructor Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLesson"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    delete:
+      tags:
+        - Instructor Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /instructor/lesson:
+    post:
+      tags:
+        - Instructor Lesson
+      summary: Create instructor lesson
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLesson"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /admin/lesson/list:
+    get:
+      tags:
+        - Admin Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: chapter
+          in: query
+          schema:
+            type: string
+        - name: course
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /admin/lesson/{id}:
+    get:
+      tags:
+        - Admin Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    put:
+      tags:
+        - Admin Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLesson"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+    delete:
+      tags:
+        - Admin Lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+
+  /admin/lesson:
+    post:
+      tags:
+        - Admin Lesson
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLesson"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"

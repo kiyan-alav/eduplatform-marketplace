@@ -8,6 +8,7 @@ import pinoHttp from "pino-http";
 import { logger } from "./configs/logger";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import apiRoutes from "./modules/index";
+import { setupSwagger } from "./swagger/swagger";
 
 const app = express();
 
@@ -43,6 +44,8 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api", apiRoutes);
+
+setupSwagger(app);
 
 app.use((_req, _res, next) => next(createHttpError(404, "Route not found")));
 
