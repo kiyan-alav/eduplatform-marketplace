@@ -19,3 +19,5 @@ model InstructorProfile {
 
     @@index([status(sort: Asc), createdAt(sort: Desc)])
 }
+
+// (سایر مدل‌های پروفایل مشابه مدل‌های بالا با رعایت ایندکس‌گذاری روی کلیدهای خارجی)

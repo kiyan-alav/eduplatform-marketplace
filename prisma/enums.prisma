@@ -15,3 +15,9 @@ enum LevelType {
   INTERMEDIATE
   ADVANCED
 }
+
+enum NotificationType {
+  INFO
+  ERROR
+  SUCCESS
+}

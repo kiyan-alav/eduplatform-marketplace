@@ -1,0 +1,27 @@
+model Chapter {
+    id            Int      @id @default(autoincrement())
+    title         String   @db.VarChar(255)
+    course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    courseId      Int
+    order         Int
+    totalDuration Int      @default(0)
+    lessons       Lesson[]
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@index([courseId, order])
+}
+
+// model Chapter {
+//     id            Int      @id @default(autoincrement())
+//     title         String   @db.VarChar(255)
+//     course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade) // اضافه شدن onDelete
+//     courseId      Int      // اینجا نباید @unique باشد. یک دوره چندین فصل دارد.
+//     order         Int
+//     totalDuration Int      @default(0)
+//     lessons       Lesson[]
+//     createdAt     DateTime @default(now())
+//     updatedAt     DateTime @updatedAt
+
+//     @@index([courseId, order]) // ایندکس مرکب عالی است
+// }

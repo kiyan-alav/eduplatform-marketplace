@@ -1,7 +1,7 @@
 model Course {
     id           Int               @id @default(autoincrement())
-    title        String
-    description  String?
+    title        String            @db.VarChar(255)
+    description  String?           @db.Text
     instructor   InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     instructorId Int
     price        Int               @default(0)
@@ -9,6 +9,42 @@ model Course {
     category     Category          @relation(fields: [categoryId], references: [id])
     categoryId   Int
     isPublished  Boolean           @default(false)
-    cover        String?
-    avgRating    Float
+    cover        String?           @db.VarChar(2048)
+    avgRating    Decimal           @default(0) @db.Decimal(4, 2)
+    ratingCount  Int               @default(0)
+    chapters     Chapter[]
+    enrollments  Enrollment[]
+    ratings      Rating[]
+    createdAt    DateTime          @default(now())
+    updatedAt    DateTime          @updatedAt
+
+    @@index([instructorId])
+    @@index([categoryId])
+    @@index([isPublished, createdAt(sort: Desc)])
 }
+
+// model Course {
+//     id           Int               @id @default(autoincrement())
+//     title        String            @db.VarChar(255)
+//     description  String?           @db.Text // استفاده از Text برای توضیحات
+//     instructor   InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+//     instructorId Int               // @unique برداشته شد، چون یک مدرس چندین دوره می‌سازد (مگر اینکه منطق بیزینس تو ۱به۱ باشد)
+//     price        Int               @default(0)
+//     level        LevelType
+//     category     Category          @relation(fields: [categoryId], references: [id])
+//     categoryId   Int               // @unique برداشته شد، یک دسته‌بندی چندین دوره دارد.
+//     isPublished  Boolean           @default(false)
+//     cover        String?           @db.VarChar(2048) // آدرس‌های تصویر طولانی هستند
+//     avgRating    Decimal           @default(0) @db.Decimal(4, 2)
+//     ratingCount  Int               @default(0)
+//     chapters     Chapter[]
+//     enrollments  Enrollment[]
+//     ratings      Rating[]
+//     createdAt    DateTime          @default(now())
+//     updatedAt    DateTime          @updatedAt
+
+//     // ایندکس‌های پیشنهادی برای پرفورمنس کوئری‌های پرکاربرد
+//     @@index([instructorId]) 
+//     @@index([categoryId])
+//     @@index([isPublished, createdAt(sort: Desc)]) // برای لیست دوره‌های منتشر شده
+// }
