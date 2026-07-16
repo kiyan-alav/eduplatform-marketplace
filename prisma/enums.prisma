@@ -1,11 +1,17 @@
 enum UserRole {
-    STUDENT
-    INSTRUCTOR
-    ADMIN
+  STUDENT
+  INSTRUCTOR
+  ADMIN
 }
 
 enum InstructorRequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum LevelType {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }

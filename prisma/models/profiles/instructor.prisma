@@ -1,0 +1,21 @@
+model InstructorProfile {
+    id          Int                     @id @default(autoincrement())
+    bio         String?
+    expertise   String[]
+    website     String?
+    instagram   String?
+    linkedin    String?
+    isVerified  Boolean                 @default(false)
+    documents   String[]                @default([])
+    status      InstructorRequestStatus @default(PENDING)
+    bankAccount String?
+    cardNumber  String?
+    sheba       String?
+    user        User                    @relation(fields: [userId], references: [id])
+    userId      Int                     @unique
+    courses     Course[]
+    createdAt   DateTime                @default(now())
+    updatedAt   DateTime                @updatedAt
+
+    @@index([status(sort: Asc), createdAt(sort: Desc)])
+}

@@ -1,0 +1,14 @@
+model Course {
+    id           Int               @id @default(autoincrement())
+    title        String
+    description  String?
+    instructor   InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    instructorId Int
+    price        Int               @default(0)
+    level        LevelType
+    category     Category          @relation(fields: [categoryId], references: [id])
+    categoryId   Int
+    isPublished  Boolean           @default(false)
+    cover        String?
+    avgRating    Float
+}

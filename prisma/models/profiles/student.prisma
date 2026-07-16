@@ -1,0 +1,9 @@
+model StudentProfile {
+    id        Int      @id @default(autoincrement())
+    interests String[] @default([])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    userId    Int      @unique
+    // ! enrolledCourses need to add: default []
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
