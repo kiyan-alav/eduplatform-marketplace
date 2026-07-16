@@ -1,0 +1,11 @@
+enum UserRole {
+    STUDENT
+    INSTRUCTOR
+    ADMIN
+}
+
+enum InstructorRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
