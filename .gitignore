@@ -63,4 +63,4 @@ dump/
 docker-compose.override.yml
 
 public/*
-/generated/prisma
+src/generated/prisma
