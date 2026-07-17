@@ -29,7 +29,9 @@ export const validateRequest =
           }),
         );
       }
-      console.error("Unexpected Validation Error:", err); 
-      return next(createHttpError(400, (err as Error).message || "Validation failed 2"));
+      console.error("Unexpected Validation Error:", err);
+      return next(
+        createHttpError(400, (err as Error).message || "Validation failed 2"),
+      );
     }
   };

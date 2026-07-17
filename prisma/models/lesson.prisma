@@ -10,5 +10,3 @@ model Lesson {
 
     @@index([chapterId])
 }
-
-//     @@index([chapterId]) // کلید خارجی باید ایندکس شود

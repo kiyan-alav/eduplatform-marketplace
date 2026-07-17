@@ -1,6 +1,6 @@
 import { Server } from "http";
 import app from "./app";
-import { connectToDB, gracefulShutdown } from "./configs/database";
+import { connectToDB, disconnectFromDB } from "./configs/database";
 import { ENV } from "./configs/env";
 import { logger } from "./configs/logger";
 
@@ -19,20 +19,45 @@ async function startServer() {
   }
 }
 
-const handleShutdown = async (signal: string) => {
+const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
   if (server) {
-    server.close(async () => {
-      logger.info("HTTP server closed.");
-      await gracefulShutdown();
+    server.close(async (err) => {
+      if (err) {
+        logger.error(err, "Error closing server:");
+        process.exit(1);
+      }
+
+      try {
+        await disconnectFromDB();
+        logger.info("Database connection closed. Exiting process.");
+        process.exit(0);
+      } catch (dbErr) {
+        logger.error(dbErr, "Error closing database:");
+        process.exit(1);
+      }
     });
   } else {
-    await gracefulShutdown();
+    process.exit(0);
   }
 };
 
-process.on("SIGTERM", () => handleShutdown("SIGTERM"));
-process.on("SIGINT", () => handleShutdown("SIGINT"));
+const unexpectedErrorHandler = (error: Error) => {
+  if (server) {
+    server.close(async () => {
+      await disconnectFromDB();
+      logger.error(error, "Unexpected error:");
+      process.exit(1);
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on("unhandledRejection", unexpectedErrorHandler);
+process.on("uncaughtException", unexpectedErrorHandler);
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 startServer();

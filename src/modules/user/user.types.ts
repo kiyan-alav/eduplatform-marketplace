@@ -2,11 +2,6 @@ import { Document, PaginateModel, Types } from "mongoose";
 import { CustomQueryOptions } from "../../utils/query-builder";
 
 // ! ─── Enum Types ────────────────────────────────────────────
-export enum UserRole {
-  ADMIN = "ADMIN",
-  INSTRUCTOR = "INSTRUCTOR",
-  STUDENT = "STUDENT",
-}
 
 // ! ─── Filter Types ────────────────────────────────────────────
 export interface IUserFilter extends CustomQueryOptions {

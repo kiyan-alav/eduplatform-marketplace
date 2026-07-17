@@ -1,5 +1,4 @@
 import createHttpError from "http-errors";
-import { PopulateOptions } from "mongoose";
 import {
   hashPassword,
   signAccessToken,
@@ -7,27 +6,32 @@ import {
   verifyPassword,
   verifyRefreshToken,
 } from "../../configs/jwt";
+import { UserRole } from "../../generated/prisma/enums";
 import { hashToken } from "../../utils/token";
-import { StudentProfile } from "../user/profiles/student/student.model";
-import { User } from "../user/user.model";
-import { UserRole } from "../user/user.types";
+import {
+  createNewUser,
+  createRefreshToken,
+  createStudentProfile,
+  deleteAllRefreshTokens,
+  findRefreshToken,
+  findUserByEmailOrPhone,
+  findUserByIdentifier,
+  findUserWithProfiles,
+} from "./auth.repository";
 import { LoginData, RegisterData } from "./auth.types";
-import { RefreshTokenModel } from "./refresh.model";
 
 export const authService = {
   async register(data: RegisterData) {
     const { email, fullName, password, phone, avatar } = data;
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { phone }],
-    });
+    const existingUser = await findUserByEmailOrPhone(email, phone);
     if (existingUser) {
       throw createHttpError(409, "User already exists");
     }
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await User.create({
+    const user = await createNewUser({
       email,
       phone,
       fullName,
@@ -36,21 +40,13 @@ export const authService = {
       avatar: avatar || null,
     });
 
-    const studentProfile = await StudentProfile.create({
-      user: user._id,
-    });
-
-    user.studentProfile = studentProfile._id;
-
-    await user.save();
+    await createStudentProfile(user.id);
   },
 
   async login(data: LoginData) {
     const { identifier, password } = data;
 
-    const existingUser = await User.findOne({
-      $or: [{ email: identifier }, { phone: identifier }],
-    });
+    const existingUser = await findUserByIdentifier(identifier);
 
     if (!existingUser) {
       throw createHttpError(404, "User not found");
@@ -66,48 +62,28 @@ export const authService = {
     }
 
     const accessToken = signAccessToken({
-      userId: existingUser._id.toString(),
+      userId: existingUser.id.toString(),
       roles: existingUser.roles,
     });
 
     const refreshToken = signRefreshToken({
-      userId: existingUser._id.toString(),
+      userId: existingUser.id.toString(),
       roles: existingUser.roles,
     });
 
-    const tokenHash = hashToken(refreshToken);
+    await createRefreshToken(
+      existingUser.id,
+      hashToken(refreshToken),
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    );
 
-    await RefreshTokenModel.create({
-      user: existingUser._id,
-      tokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
+    const user = await findUserWithProfiles(existingUser.id);
 
-    const userRoles = existingUser.roles;
-    const populateFields: PopulateOptions[] = [];
-
-    if (userRoles.includes(UserRole.ADMIN)) {
-      populateFields.push({
-        path: "adminProfile",
-      });
-    }
-    if (userRoles.includes(UserRole.INSTRUCTOR)) {
-      populateFields.push({
-        path: "instructorProfile",
-        select: "bio expertise socialLinks verification payoutInfo",
-      });
-    }
-    if (userRoles.includes(UserRole.STUDENT)) {
-      populateFields.push({
-        path: "studentProfile",
-        select: "interests",
-      });
+    if (!user) {
+      throw createHttpError(404, "User not found");
     }
 
-    const userData = await User.findById(existingUser._id)
-      .select("-__v -passwordHash")
-      .populate(populateFields)
-      .lean();
+    const { passwordHash, ...userData } = user;
 
     return {
       accessToken,
@@ -117,39 +93,15 @@ export const authService = {
   },
 
   async getMe(userId: string) {
-    const existingUser = await User.findById(userId);
+    const user = await findUserWithProfiles(Number(userId));
 
-    if (!existingUser) {
+    if (!user) {
       throw createHttpError(404, "User not found");
     }
 
-    const userRoles = existingUser.roles;
-    const populateFields: PopulateOptions[] = [];
+    const { passwordHash, ...userData } = user;
 
-    if (userRoles.includes(UserRole.ADMIN)) {
-      populateFields.push({
-        path: "adminProfile",
-      });
-    }
-    if (userRoles.includes(UserRole.INSTRUCTOR)) {
-      populateFields.push({
-        path: "instructorProfile",
-        select: "bio expertise socialLinks verification payoutInfo",
-      });
-    }
-    if (userRoles.includes(UserRole.STUDENT)) {
-      populateFields.push({
-        path: "studentProfile",
-        select: "interests",
-      });
-    }
-
-    const user = await User.findById(userId)
-      .select("-passwordHash -__v")
-      .populate(populateFields)
-      .lean();
-
-    return user;
+    return userData;
   },
 
   async refreshToken(token: string) {
@@ -167,17 +119,18 @@ export const authService = {
 
     const tokenHash = hashToken(token);
 
-    const storedToken = await RefreshTokenModel.findOne({
-      user: payload.userId,
+    const storedToken = await findRefreshToken(
+      Number(payload.userId),
       tokenHash,
-    });
+    );
 
     if (!storedToken) {
       throw createHttpError(401, "Refresh token revoked");
     }
 
     if (storedToken.expiresAt < new Date()) {
-      await storedToken.deleteOne();
+      await deleteAllRefreshTokens(storedToken.id);
+
       throw createHttpError(401, "Refresh token expired");
     }
 

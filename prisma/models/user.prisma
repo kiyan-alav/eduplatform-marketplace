@@ -9,7 +9,7 @@ model User {
     studentProfile    StudentProfile?
     instructorProfile InstructorProfile?
     adminProfile      AdminProfile?
-    refreshToken      Refresh?
+    refreshTokens     Refresh[]
     notifications     Notification[]
     ratings           Rating[]
     createdAt         DateTime           @default(now())

@@ -3,7 +3,6 @@ import fs from "fs";
 import createError from "http-errors";
 import multer from "multer";
 import path from "path";
-import { logger } from "../configs/logger";
 
 export const makeUploader = (
   folder: string,

@@ -1,8 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { Types } from "mongoose";
-import { z } from "zod";
-import { UserRole } from "../modules/user/user.types";
+import { UserRole } from "../generated/prisma/enums";
 import { ENV } from "./env";
 
 export interface JwtPayload {
@@ -40,13 +38,3 @@ export const verifyPassword = async (pass: string, hashPass: string) => {
   const isValid = await bcrypt.compare(pass, hashPass);
   return isValid;
 };
-
-export const objectIdSchema = z
-  .string()
-  .refine((val) => Types.ObjectId.isValid(val), {
-    message: "Invalid MongoDB ObjectId",
-  });
-
-export const paramsSchema = z.object({
-  id: objectIdSchema,
-});
