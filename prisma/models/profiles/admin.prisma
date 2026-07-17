@@ -4,6 +4,6 @@ model AdminProfile {
     userId    Int      @unique
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-}
 
-// (سایر مدل‌های پروفایل مشابه مدل‌های بالا با رعایت ایندکس‌گذاری روی کلیدهای خارجی)
+    @@index([userId])
+}

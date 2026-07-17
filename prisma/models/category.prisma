@@ -8,14 +8,3 @@ model Category {
 
     @@index([createdAt(sort: Desc)])
 }
-
-// model Category {
-//     id        Int      @id @default(autoincrement())
-//     name      String   @unique @db.VarChar(100) // 255 برای نام دسته زیاد است، 100 کافیست
-//     slug      String   @unique @db.VarChar(100)
-//     courses   Course[]
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-
-//     @@index([createdAt(sort: Desc)])
-// }

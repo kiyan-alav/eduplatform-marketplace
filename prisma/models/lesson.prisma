@@ -11,15 +11,4 @@ model Lesson {
     @@index([chapterId])
 }
 
-// model Lesson {
-//     id        Int      @id @default(autoincrement())
-//     title     String   @db.VarChar(255)
-//     chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-//     chapterId Int
-//     duration  Int
-//     order     Int
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-
 //     @@index([chapterId]) // کلید خارجی باید ایندکس شود
-// }

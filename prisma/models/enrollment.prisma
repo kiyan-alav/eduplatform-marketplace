@@ -11,17 +11,3 @@ model Enrollment {
     @@id([studentId, courseId])
     @@index([courseId])
 }
-
-// model Enrollment {
-//     student   StudentProfile @relation(fields: [studentId], references: [id])
-//     studentId Int
-//     course    Course         @relation(fields: [courseId], references: [id])
-//     courseId  Int
-//     paid      Int
-//     paidAt    DateTime
-//     createdAt DateTime       @default(now())
-//     updatedAt DateTime       @updatedAt
-
-//     @@id([studentId, courseId])
-//     @@index([courseId]) // برای اینکه بفهمیم چه کسانی در یک دوره ثبت‌نام کرده‌اند
-// }

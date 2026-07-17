@@ -12,18 +12,3 @@ model Notification {
 
     @@index([userId, isRead, createdAt(sort: Desc)])
 }
-
-// model Notification {
-//     id          Int              @id @default(autoincrement())
-//     title       String           @db.VarChar(255)
-//     description String?          @db.Text
-//     user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-//     userId      Int
-//     isRead      Boolean          @default(false)
-//     readAt      DateTime?        // احتمالا وقتی خوانده نشده، این مقدار باید Null باشد
-//     type        NotificationType
-//     createdAt   DateTime         @default(now())
-//     updatedAt   DateTime         @updatedAt
-
-//     @@index([userId, isRead, createdAt(sort: Desc)]) // بهبود ایندکس برای فیلتر کردن نوتیف‌های خوانده نشده
-// }

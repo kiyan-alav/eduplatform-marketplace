@@ -1,11 +1,11 @@
 model User {
     id                Int                @id @default(autoincrement())
-    email             String             @unique
-    phone             String             @unique
-    fullName          String
+    email             String             @unique @db.VarChar(255)
+    phone             String             @unique @db.VarChar(20)
+    fullName          String             @db.VarChar(255)
     passwordHash      String
     roles             UserRole[]         @default([STUDENT])
-    avatar            String?
+    avatar            String?            @db.VarChar(2048)
     studentProfile    StudentProfile?
     instructorProfile InstructorProfile?
     adminProfile      AdminProfile?
@@ -18,23 +18,3 @@ model User {
     @@index([createdAt(sort: Desc)])
     @@index([roles, createdAt(sort: Desc)])
 }
-
-// model User {
-//     id                Int                @id @default(autoincrement())
-//     email             String             @unique @db.VarChar(255)
-//     phone             String             @unique @db.VarChar(20)
-//     fullName          String             @db.VarChar(100)
-//     passwordHash      String
-//     roles             UserRole[]         @default([STUDENT])
-//     avatar            String?            @db.VarChar(2048)
-//     studentProfile    StudentProfile?
-//     instructorProfile InstructorProfile?
-//     adminProfile      AdminProfile?
-//     refreshToken      Refresh?
-//     notifications     Notification[]
-//     ratings           Rating[]
-//     createdAt         DateTime           @default(now())
-//     updatedAt         DateTime           @updatedAt
-
-//     @@index([roles])
-// }

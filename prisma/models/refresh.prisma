@@ -10,15 +10,3 @@ model Refresh {
     @@index([userId])
     @@index([expiresAt])
 }
-
-// model Refresh {
-//     id        Int      @id @default(autoincrement())
-//     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//     userId    Int      @unique
-//     tokenHash String   @unique // ایندکس یونیک خودکار ایندکس را هم می‌سازد
-//     expiresAt DateTime
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-
-//     @@index([expiresAt]) // خوب است برای پاکسازی توکن‌های منقضی شده
-// }
