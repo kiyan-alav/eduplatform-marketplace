@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import createHttpError from "http-errors";
+import { UserRole } from "../generated/prisma/enums";
 import { InstructorProfile } from "../modules/user/profiles/instructor/instructor.model";
-import { UserRole } from "../modules/user/user.types";
 import { AuthRequest } from "./auth.middleware";
 
 type ConditionFn = (req: AuthRequest) => Promise<boolean>;
