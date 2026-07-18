@@ -1,38 +1,20 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
-
-// ! ─── Enum Types ────────────────────────────────────────────
-export enum NotificationType {
-  INFO = "INFO",
-  ERROR = "ERROR",
-  SUCCESS = "SUCCESS",
-}
+import { z } from "zod";
+import { NotificationType } from "../../generated/prisma/enums";
+import { NotificationListQuerySchema } from "./notification.filter";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface INotificationFilter extends CustomQueryOptions {
+export type NotificationListQuery = z.infer<typeof NotificationListQuerySchema>;
+
+export type GetAllNotificationQuery = {
+  page: number;
+  limit: number;
   isRead?: boolean;
   type?: NotificationType;
-}
-
-// ! ─── Core Types ────────────────────────────────────────────
-export interface INotification {
-  title: string;
-  description: string | null;
-  user: Types.ObjectId;
-  isRead: boolean;
-  readAt: Date | null;
-  type: NotificationType;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface INotificationDocument extends INotification, Document {}
-
-export interface INotificationPaginateModel extends PaginateModel<INotificationDocument> {}
+};
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface CreateNotificationInput {
-  user: string;
+  user: number;
   title: string;
   description?: string;
   type: NotificationType;

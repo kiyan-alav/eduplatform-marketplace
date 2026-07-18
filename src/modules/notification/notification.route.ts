@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authGuard } from "../../middlewares/auth.middleware";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { notificationController } from "./notidication.controller";
+import { notificationController } from "./notification.controller";
 import { NotificationListQuerySchema } from "./notification.filter";
 
 const notificationRouter = Router();

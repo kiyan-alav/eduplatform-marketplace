@@ -8,6 +8,7 @@ import {
   UserListQuerySchema,
 } from "./user.filter";
 
+// ! ─── Filter Types ────────────────────────────────────────────
 export type UserListQuery = z.infer<typeof UserListQuerySchema>;
 
 export type InstructorRequestQuery = z.infer<

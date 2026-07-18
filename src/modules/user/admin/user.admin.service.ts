@@ -1,15 +1,13 @@
 import createHttpError from "http-errors";
-import { z } from "zod";
-import { UserRole } from "../../../generated/prisma/enums";
-import { InstructorRequestStatus } from "../profiles/instructor/instructor.types";
 import {
-  InstructorRequestQuerySchema,
-  UserListQuerySchema,
-} from "../user.filter";
+  InstructorRequestStatus,
+  UserRole,
+} from "../../../generated/prisma/enums";
+import { InstructorRequestQuery, UserListQuery } from "../user.types";
 import { adminUserRepository } from "./user.admin.repository";
 
 export const adminUserService = {
-  async userList(query: z.infer<typeof UserListQuerySchema>) {
+  async userList(query: UserListQuery) {
     const { page, limit, email, phone, role } = query;
 
     const result = await adminUserRepository.getAll({
@@ -33,9 +31,7 @@ export const adminUserService = {
     return userDoc;
   },
 
-  async instructorRequestsList(
-    query: z.infer<typeof InstructorRequestQuerySchema>,
-  ) {
+  async instructorRequestsList(query: InstructorRequestQuery) {
     const { page, limit, email, phone } = query;
 
     const result = await adminUserRepository.getAllInstructorRequest({

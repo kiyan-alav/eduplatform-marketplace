@@ -1,5 +1,6 @@
 import { UserRole } from "../../generated/prisma/enums";
 
+// ! ─── Request Types ────────────────────────────────────────────
 export interface RegisterData {
   email: string;
   phone: string;

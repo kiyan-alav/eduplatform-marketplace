@@ -1,58 +1,50 @@
-import { buildQueryFilters } from "../../utils/query-builder";
-import { notificationFilterConfig } from "./notification.filter";
-import { Notification } from "./notification.model";
+import { notificationRepository } from "./notification.repository";
 import {
   CreateNotificationInput,
-  INotificationFilter,
+  NotificationListQuery,
 } from "./notification.types";
 
 export const notificationService = {
   async create(data: CreateNotificationInput) {
-    return await Notification.create({
+    return await notificationRepository.create({
       title: data.title,
-      description: data.description || null,
+      description: data.description,
       user: data.user,
       type: data.type,
     });
   },
 
-  async getAll(filters: INotificationFilter, userId: string) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      notificationFilterConfig,
-    );
+  async getAll(query: NotificationListQuery, userId: number) {
+    const { page, limit, isRead, type } = query;
 
-    mongoFilter.user = userId;
-
-    const result = await Notification.paginate(
-      { ...mongoFilter, user: userId },
-      options,
+    const result = await notificationRepository.getAll(
+      {
+        page,
+        limit,
+        isRead,
+        type,
+      },
+      userId,
     );
 
     return result;
   },
 
-  async getUnreadCount(userId: string) {
-    const unreadCount = await Notification.countDocuments({
-      user: userId,
-      isRead: false,
-    });
+  async getUnreadCount(userId: number) {
+    const unreadCount = await notificationRepository.unReadCount(userId);
     return unreadCount;
   },
 
-  async markAsRead(notificationId: string, userId: string) {
-    const notification = await Notification.findOneAndUpdate(
-      { _id: notificationId, user: userId },
-      { isRead: true, readAt: new Date() },
+  async markAsRead(notificationId: number, userId: number) {
+    const notification = await notificationRepository.markAsRead(
+      userId,
+      notificationId,
     );
     return notification;
   },
 
-  async markAllAsRead(userId: string) {
-    const notifications = await Notification.updateMany(
-      { user: userId, isRead: false },
-      { isRead: true, readAt: new Date() },
-    );
+  async markAllAsRead(userId: number) {
+    const notifications = await notificationRepository.markAllAsRead(userId);
     return notifications;
   },
 };
