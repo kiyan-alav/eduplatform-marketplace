@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaginationSchema } from "../../utils/paginationSchema";
+import { PaginationSchema } from "../../utils/baseFilterSchema";
 import { FilterConfig } from "../../utils/query-builder";
 import { ILessonFilter } from "./lesson.types";
 

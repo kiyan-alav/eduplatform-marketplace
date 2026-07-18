@@ -1,71 +1,62 @@
 import bcrypt from "bcryptjs";
 import createHttpError from "http-errors";
-import { InstructorProfile } from "../profiles/instructor/instructor.model";
-import { InstructorRequestStatus } from "../profiles/instructor/instructor.types";
-import { StudentProfile } from "../profiles/student/student.model";
-import { User } from "../user.model";
-import { UserRole } from "../user.types";
 import { UpdateProfileInput } from "../user.validation";
+import { userRepository } from "./user.repository";
 import { notificationService } from "../../notification/notification.service";
-import { NotificationType } from "../../notification/notification.types";
+import { NotificationType } from "../../../generated/prisma/enums";
 
 export const userService = {
   async updateProfile(
-    userId: string,
+    userId: number,
     payload: UpdateProfileInput,
     avatar?: string,
   ) {
-    const user = await User.findById(userId);
+    const user = await userRepository.findUserByIdWithProfiles(userId);
+
     if (!user) throw createHttpError.NotFound("User not found");
 
-    if (typeof payload.fullName === "string") {
-      user.fullName = payload.fullName.trim();
-    }
-
-    if (typeof avatar === "string") {
-      user.avatar = avatar;
+    if (typeof payload.fullName === "string" || typeof avatar === "string") {
+      await userRepository.updateUser(userId, {
+        ...(typeof payload.fullName === "string"
+          ? { fullName: payload.fullName.trim() }
+          : {}),
+        ...(typeof avatar === "string" ? { avatar } : {}),
+      });
     }
 
     if (payload.studentProfile) {
-      if (!user.studentProfile)
-        throw createHttpError(400, "Student profile not found");
-      await StudentProfile.findByIdAndUpdate(
-        user.studentProfile,
-        {
-          $set: payload.studentProfile,
-        },
-        {
-          runValidators: true,
-        },
-      );
+      if (!user.studentProfile) {
+        throw createHttpError.BadRequest("Student profile not found");
+      }
+
+      await userRepository.updateStudentProfile(user.studentProfile.id, {
+        ...payload.studentProfile,
+      });
     }
 
     if (payload.instructorProfile) {
-      if (!user.instructorProfile)
-        throw createHttpError(400, "Instructor profile not found");
-      await InstructorProfile.findByIdAndUpdate(
-        user.instructorProfile,
-        {
-          $set: payload.instructorProfile,
-        },
-        {
-          runValidators: true,
-        },
-      );
+      if (!user.instructorProfile) {
+        throw createHttpError.BadRequest("Instructor profile not found");
+      }
+
+      await userRepository.updateInstructorProfile(user.instructorProfile.id, {
+        ...payload.instructorProfile,
+      });
     }
 
-    await user.save();
-    return user;
+    return userRepository.findUserByIdWithProfiles(userId);
   },
 
   async changePassword(
-    userId: string,
+    userId: number,
     currentPassword: string,
     newPassword: string,
   ) {
-    const user = await User.findById(userId);
+    const user = await userRepository.findUserById(userId);
 
-    if (!user) throw createHttpError.NotFound("User not found");
+    if (!user) {
+      throw createHttpError.NotFound("User not found");
+    }
 
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
@@ -77,47 +68,41 @@ export const userService = {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    user.passwordHash = hashedPassword;
-
-    await user.save();
+    await userRepository.updatePassword(userId, hashedPassword);
 
     return true;
   },
 
-  async applyForInstructor(userId: string, documents: string[]) {
-    const user = await User.findById(userId);
-
-    if (!user) throw createHttpError.NotFound("User not found");
-
-    if (user.instructorProfile) {
-      throw createHttpError.BadRequest("Instructor request already submitted");
-    }
-
-    const instructorProfile = await InstructorProfile.create({
-      user: user._id,
-      verification: {
+  async applyForInstructor(userId: number, documents: string[]) {
+    try {
+      const instructorProfile = await userRepository.createInstructorApplication(
+        userId,
         documents,
-        status: InstructorRequestStatus.PENDING,
-        isVerified: false,
-      },
-    });
+      );
 
-    user.instructorProfile = instructorProfile._id;
+      await notificationService.create({
+        user: userId,
+        title: "Your request has been submitted",
+        description:
+          "After review, your instructor application will be approved or rejected. You will receive a notification once the review is complete.",
+        type: NotificationType.SUCCESS,
+      });
 
-    if (!user.roles.includes(UserRole.INSTRUCTOR)) {
-      user.roles.push(UserRole.INSTRUCTOR);
+      return instructorProfile;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "USER_NOT_FOUND") {
+          throw createHttpError.NotFound("User not found");
+        }
+
+        if (error.message === "INSTRUCTOR_REQUEST_ALREADY_SUBMITTED") {
+          throw createHttpError.BadRequest(
+            "Instructor request already submitted",
+          );
+        }
+      }
+
+      throw error;
     }
-
-    await user.save();
-
-    await notificationService.create({
-      user: user._id.toString(),
-      title: "Your request has been submitted",
-      description:
-        "After review, your instructor application will be approved or rejected. You will receive a notification once the review is complete.",
-      type: NotificationType.SUCCESS,
-    });
-
-    return instructorProfile;
   },
 };

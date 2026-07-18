@@ -13,7 +13,7 @@ export const userController = {
       ? `${ENV.BASE_URL}/public/users/avatars/${req.file.filename}`
       : undefined;
 
-    const user = await userService.updateProfile(userId, req.body, avatar);
+    const user = await userService.updateProfile(+userId, req.body, avatar);
 
     const response = buildApiResponse({
       success: true,
@@ -29,7 +29,7 @@ export const userController = {
 
     const { currentPassword, newPassword } = req.body;
 
-    await userService.changePassword(userId, currentPassword, newPassword);
+    await userService.changePassword(+userId, currentPassword, newPassword);
 
     const response = buildApiResponse({
       success: true,
@@ -47,7 +47,7 @@ export const userController = {
         (file) => `${ENV.BASE_URL}/public/instructor/docs/${file.filename}`,
       ) || [];
 
-    const instructor = await userService.applyForInstructor(userId, documents);
+    const instructor = await userService.applyForInstructor(+userId, documents);
 
     const response = buildApiResponse({
       success: true,

@@ -1,32 +1,37 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
+import { z } from "zod";
+import {
+  InstructorRequestStatus,
+  UserRole,
+} from "../../generated/prisma/enums";
+import {
+  InstructorRequestQuerySchema,
+  UserListQuerySchema,
+} from "./user.filter";
 
-// ! ─── Enum Types ────────────────────────────────────────────
+export type UserListQuery = z.infer<typeof UserListQuerySchema>;
 
-// ! ─── Filter Types ────────────────────────────────────────────
-export interface IUserFilter extends CustomQueryOptions {
+export type InstructorRequestQuery = z.infer<
+  typeof InstructorRequestQuerySchema
+>;
+
+export type GetAllUserQuery = {
+  page: number;
+  limit: number;
   email?: string;
   phone?: string;
-  fullName?: string;
-  roles?: UserRole[];
-}
+  role?: string;
+};
 
-// ! ─── Core Types ────────────────────────────────────────────
-export interface IBaseUser {
-  email: string;
-  phone: string;
-  fullName: string;
-  passwordHash: string;
+export type GetAllInstructorRequestQuery = {
+  page: number;
+  limit: number;
+  email?: string;
+  phone?: string;
+};
+
+export interface UpdateInstructorRequestStatus {
+  userId: number;
+  status: InstructorRequestStatus;
+  isVerified: boolean;
   roles: UserRole[];
-  avatar: string | null;
-  studentProfile: Types.ObjectId | null;
-  instructorProfile: Types.ObjectId | null;
-  adminProfile: Types.ObjectId | null;
-  isBlocked: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
 }
-
-export interface IBaseUserDocument extends IBaseUser, Document {}
-
-export interface IBaseUserPaginateModel extends PaginateModel<IBaseUserDocument> {}

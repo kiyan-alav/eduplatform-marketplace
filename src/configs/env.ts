@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { logger } from "./logger";
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(5000),

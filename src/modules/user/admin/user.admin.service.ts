@@ -1,95 +1,55 @@
 import createHttpError from "http-errors";
-import { buildQueryFilters } from "../../../utils/query-builder";
+import { z } from "zod";
+import { UserRole } from "../../../generated/prisma/enums";
+import { InstructorRequestStatus } from "../profiles/instructor/instructor.types";
 import {
-  IInstructorProfileDocument,
-  InstructorRequestStatus,
-} from "../profiles/instructor/instructor.types";
-import {
-  instructorRequestsFilterConfig,
-  userFilterConfig,
+  InstructorRequestQuerySchema,
+  UserListQuerySchema,
 } from "../user.filter";
-import { User } from "../user.model";
-import { IUserFilter, UserRole } from "../user.types";
+import { adminUserRepository } from "./user.admin.repository";
 
 export const adminUserService = {
-  async userList(filters: IUserFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      userFilterConfig,
-    );
+  async userList(query: z.infer<typeof UserListQuerySchema>) {
+    const { page, limit, email, phone, role } = query;
 
-    const result = await User.paginate(mongoFilter, options);
+    const result = await adminUserRepository.getAll({
+      page,
+      limit,
+      email,
+      phone,
+      role,
+    });
 
     return result;
   },
 
-  async singleUser(id: string) {
-    const query = User.findById(id);
-
-    const userDoc = await User.findById(id).select("roles");
+  async singleUser(id: number) {
+    const userDoc = await adminUserRepository.getWithProfiles(id);
 
     if (!userDoc) {
       throw createHttpError(404, "User not found");
     }
 
-    if (userDoc.roles.includes(UserRole.ADMIN)) {
-      query.populate({
-        path: "adminProfile",
-      });
-    }
-    if (userDoc.roles.includes(UserRole.INSTRUCTOR)) {
-      query.populate({
-        path: "instructorProfile",
-        select: "bio expertise socialLinks verification payoutInfo",
-      });
-    }
-    if (userDoc.roles.includes(UserRole.STUDENT)) {
-      query.populate({
-        path: "studentProfile",
-        select: "interests",
-      });
-    }
-
-    const user = await query.exec();
-    return user;
+    return userDoc;
   },
 
-  async instructorRequestsList(filters: IUserFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      instructorRequestsFilterConfig,
-    );
+  async instructorRequestsList(
+    query: z.infer<typeof InstructorRequestQuerySchema>,
+  ) {
+    const { page, limit, email, phone } = query;
 
-    mongoFilter["instructorProfile"] = { $exists: true, $ne: null };
-
-    const result = await User.paginate(mongoFilter, {
-      ...options,
-      populate: [
-        {
-          path: "instructorProfile",
-          select: "verification",
-        },
-      ],
+    const result = await adminUserRepository.getAllInstructorRequest({
+      page,
+      limit,
+      email,
+      phone,
     });
 
     return result;
   },
 
-  async singleInstructorRequest(id: string) {
-    const user = await User.findById(id).populate({
-      path: "instructorProfile",
-      select: "verification bio expertise socialLinks payoutInfo",
-    });
-
-    if (!user) {
-      throw createHttpError(404, "User not found");
-    }
-  },
-
-  async applyInstructorRequest(id: string) {
-    const user = await User.findById(id).populate<{
-      instructorProfile: IInstructorProfileDocument;
-    }>("instructorProfile");
+  async applyInstructorRequest(id: number) {
+    const user = await adminUserRepository.getUserWithInstructorProfile(id);
 
     if (!user) {
       throw createHttpError(404, "User not found");
@@ -99,34 +59,24 @@ export const adminUserService = {
       throw createHttpError(400, "User has no instructor request");
     }
 
-    const instructorProfile = user.instructorProfile;
-
-    if (
-      instructorProfile.verification.status === InstructorRequestStatus.APPROVED
-    ) {
+    if (user.instructorProfile.status === InstructorRequestStatus.APPROVED) {
       throw createHttpError(400, "Instructor request already approved");
     }
 
-    instructorProfile.verification.status = InstructorRequestStatus.APPROVED;
-    instructorProfile.verification.isVerified = true;
+    const roles = user.roles.includes(UserRole.INSTRUCTOR)
+      ? user.roles
+      : [...user.roles, UserRole.INSTRUCTOR];
 
-    await instructorProfile.save();
-
-    if (!user.roles.includes(UserRole.INSTRUCTOR)) {
-      user.roles.push(UserRole.INSTRUCTOR);
-      await user.save();
-    }
-
-    return {
-      user,
-      instructorProfile,
-    };
+    return adminUserRepository.updateInstructorRequestStatus({
+      userId: id,
+      isVerified: true,
+      status: InstructorRequestStatus.APPROVED,
+      roles,
+    });
   },
 
-  async rejectInstructorRequest(userId: string) {
-    const user = await User.findById(userId).populate<{
-      instructorProfile: IInstructorProfileDocument;
-    }>("instructorProfile");
+  async rejectInstructorRequest(id: number) {
+    const user = await adminUserRepository.getUserWithInstructorProfile(id);
 
     if (!user) {
       throw createHttpError(404, "User not found");
@@ -136,27 +86,17 @@ export const adminUserService = {
       throw createHttpError(400, "User has no instructor request");
     }
 
-    const instructorProfile = user.instructorProfile;
-
-    if (
-      instructorProfile.verification.status === InstructorRequestStatus.REJECTED
-    ) {
+    if (user.instructorProfile.status === InstructorRequestStatus.REJECTED) {
       throw createHttpError(400, "Instructor request already rejected");
     }
 
-    instructorProfile.verification.status = InstructorRequestStatus.REJECTED;
-    instructorProfile.verification.isVerified = false;
+    const roles = user.roles.filter((role) => role !== UserRole.INSTRUCTOR);
 
-    await instructorProfile.save();
-
-    if (user.roles.includes(UserRole.INSTRUCTOR)) {
-      user.roles = user.roles.filter((role) => role !== UserRole.INSTRUCTOR);
-      await user.save();
-    }
-
-    return {
-      user,
-      instructorProfile,
-    };
+    return adminUserRepository.updateInstructorRequestStatus({
+      userId: id,
+      isVerified: false,
+      status: InstructorRequestStatus.REJECTED,
+      roles,
+    });
   },
 };

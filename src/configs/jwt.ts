@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
+import { z } from "zod";
 import { UserRole } from "../generated/prisma/enums";
 import { ENV } from "./env";
 
@@ -38,3 +39,7 @@ export const verifyPassword = async (pass: string, hashPass: string) => {
   const isValid = await bcrypt.compare(pass, hashPass);
   return isValid;
 };
+
+export const paramsSchema = z.object({
+  id: z.coerce.number().int(),
+});

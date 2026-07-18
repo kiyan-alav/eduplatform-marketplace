@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { InstructorRequestQuerySchema, UserListQuerySchema } from "../user.filter";
 import { adminUserService } from "./user.admin.service";
 
 export const adminUserController = {
   users: asyncHandler(async (req: Request, res: Response) => {
-    const usersData = await adminUserService.userList(req.query);
+    const query = UserListQuerySchema.parse(req.query);
+    const usersData = await adminUserService.userList(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: usersData.docs,
+      data: usersData.items,
       meta: {
         limit: usersData.limit,
         page: usersData.page as number,
@@ -27,7 +29,7 @@ export const adminUserController = {
   singleUser: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
 
-    const user = await adminUserService.singleUser(id);
+    const user = await adminUserService.singleUser(+id);
 
     const response = buildApiResponse({
       success: true,
@@ -39,13 +41,14 @@ export const adminUserController = {
   }),
 
   instructorRequests: asyncHandler(async (req: Request, res: Response) => {
+    const query = InstructorRequestQuerySchema.parse(req.query);
     const instructorRequestsData =
-      await adminUserService.instructorRequestsList(req.query);
+      await adminUserService.instructorRequestsList(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: instructorRequestsData.docs,
+      data: instructorRequestsData.totalDocs,
       meta: {
         limit: instructorRequestsData.limit,
         page: instructorRequestsData.page as number,
@@ -62,7 +65,7 @@ export const adminUserController = {
   applyRequests: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
 
-    const data = await adminUserService.applyInstructorRequest(id);
+    const data = await adminUserService.applyInstructorRequest(+id);
 
     const response = buildApiResponse({
       success: true,
@@ -76,7 +79,7 @@ export const adminUserController = {
   rejectRequests: asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
 
-    const data = await adminUserService.rejectInstructorRequest(id);
+    const data = await adminUserService.rejectInstructorRequest(+id);
 
     const response = buildApiResponse({
       success: true,
