@@ -1,35 +1,24 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
-
-// ! ─── Core Types ────────────────────────────────────────────
-export interface IChapter {
-  title: string;
-  course: Types.ObjectId;
-  order: number;
-  totalDuration: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface IChapterDocument extends IChapter, Document {}
-
-export interface IChapterPaginateModel extends PaginateModel<IChapterDocument> {}
+import { z } from "zod";
+import { PaginationParams } from "../../types/buildPagination";
+import { ChapterListQuerySchema } from "./chapter.filter";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface IChapterFilter extends CustomQueryOptions {
+export type ChapterListQuery = z.infer<typeof ChapterListQuerySchema>;
+
+export interface GetAllChapterQuery extends PaginationParams {
   title?: string;
-  course?: string;
+  courseId?: number;
 }
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateChapterRequest {
   title: string;
-  course: string;
+  courseId: number;
   order: number;
 }
 
 export interface IUpdateChapterRequest {
   title?: string;
-  course?: string;
+  courseId?: number;
   order?: number;
 }

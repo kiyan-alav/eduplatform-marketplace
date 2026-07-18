@@ -3,13 +3,13 @@ import { paramsSchema } from "../../../configs/jwt";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
-import { UserRole } from "../../user/user.types";
 import { ChapterListQuerySchema } from "../chapter.filter";
 import {
   createChapterSchema,
   updateChapterSchema,
 } from "../chapter.validation";
 import { chapterAdminController } from "./chapter.admin.controller";
+import { UserRole } from "../../../generated/prisma/enums";
 
 const chapterAdminRouter = Router();
 

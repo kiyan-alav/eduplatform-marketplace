@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { ChapterListQuerySchema } from "../chapter.filter";
 import { chapterService } from "./chapter.service";
 
 export const chapterController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const chapterData = await chapterService.getAll(req.query);
+    const query = ChapterListQuerySchema.parse(req.query);
+    const chapterData = await chapterService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: chapterData.docs,
+      data: chapterData.items,
       meta: {
         limit: chapterData.limit,
         page: chapterData.page as number,
@@ -25,7 +28,7 @@ export const chapterController = {
   }),
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const chapter = await chapterService.getOne(id);
 
     const response = buildApiResponse({

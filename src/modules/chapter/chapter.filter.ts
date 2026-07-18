@@ -1,16 +1,7 @@
 import { z } from "zod";
-import { PaginationSchema } from "../../utils/baseFilterSchema";
-import { FilterConfig } from "../../utils/query-builder";
-import { IChapterFilter } from "./chapter.types";
+import { BaseListQuerySchema } from "../../utils/baseFilterSchema";
 
-export const chapterFilterConfig: FilterConfig<IChapterFilter> = {
-  searchable: ["title"],
-  regex: ["title"],
-  exact: ["course"],
-  enumList: [],
-};
-
-export const ChapterListQuerySchema = PaginationSchema.extend({
+export const ChapterListQuerySchema = BaseListQuerySchema.extend({
   title: z.string().optional(),
-  course: z.string().optional(),
+  courseId: z.coerce.number().int().positive().optional(),
 });

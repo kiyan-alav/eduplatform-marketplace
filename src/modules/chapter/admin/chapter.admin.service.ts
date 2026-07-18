@@ -1,32 +1,18 @@
 import createHttpError from "http-errors";
-import { startSession, Types } from "mongoose";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { Lesson } from "../../lesson/lesson.model";
-import { chapterFilterConfig } from "../chapter.filter";
-import { Chapter } from "../chapter.model";
 import {
-  IChapterFilter,
+  ChapterListQuery,
   ICreateChapterRequest,
   IUpdateChapterRequest,
 } from "../chapter.types";
+import { chapterAdminRepository } from "./chapter.admin.repository";
 
 export const chapterAdminService = {
-  async getAll(filters: IChapterFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      chapterFilterConfig,
-    );
-    options.populate = [{ path: "course", select: "title" }];
-    options.sort = { order: 1 };
-
-    return Chapter.paginate(mongoFilter, options);
+  async getAll(query: ChapterListQuery) {
+    return chapterAdminRepository.getAll(query);
   },
 
-  async getOne(id: string) {
-    const chapter = await Chapter.findById(id).populate({
-      path: "course",
-      select: "title",
-    });
+  async getOne(id: number) {
+    const chapter = await chapterAdminRepository.findById(id);
 
     if (!chapter) {
       throw createHttpError(404, "Chapter not found!");
@@ -36,84 +22,36 @@ export const chapterAdminService = {
   },
 
   async create(data: ICreateChapterRequest) {
-    const title = data.title.trim();
+    const lastChapter = await chapterAdminRepository.findLastCourseChapter(
+      data.courseId,
+    );
 
-    if (!Types.ObjectId.isValid(data.course)) {
-      throw createHttpError(400, "Invalid course id");
-    }
+    const nextOrder = lastChapter ? lastChapter.order + 1 : 1;
 
-    const courseId = new Types.ObjectId(data.course);
-
-    const session = await startSession();
-    session.startTransaction();
-
-    try {
-      const lastChapter = await Chapter.findOne({ course: courseId })
-        .sort({ order: -1 })
-        .session(session);
-
-      const nextOrder = lastChapter ? lastChapter.order + 1 : 1;
-
-      const chapter = await Chapter.create(
-        [
-          {
-            title,
-            course: courseId,
-            order: nextOrder,
-          },
-        ],
-        { session },
-      );
-
-      await session.commitTransaction();
-      session.endSession();
-
-      return chapter[0];
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw error;
-    }
+    return chapterAdminRepository.create({
+      title: data.title.trim(),
+      courseId: data.courseId,
+      order: nextOrder,
+    });
   },
 
-  async edit(id: string, data: IUpdateChapterRequest) {
-    const chapter = await Chapter.findById(id);
+  async edit(id: number, data: IUpdateChapterRequest) {
+    const chapter = await chapterAdminRepository.findById(id);
 
     if (!chapter) {
       throw createHttpError(404, "Chapter not found!");
     }
 
-    if (typeof data.title === "string") {
-      chapter.title = data.title.trim();
-    }
-
-    if (typeof data.order === "number") {
-      chapter.order = data.order;
-    }
-
-    if (typeof data.course === "string") {
-      if (!Types.ObjectId.isValid(data.course)) {
-        throw createHttpError(400, "Invalid course id");
-      }
-
-      chapter.course = new Types.ObjectId(data.course);
-    }
-
-    await chapter.save();
-
-    return chapter;
+    return chapterAdminRepository.update(id, data);
   },
 
-  async delete(id: string) {
-    const chapter = await Chapter.findById(id);
+  async delete(id: number) {
+    const chapter = await chapterAdminRepository.findById(id);
 
     if (!chapter) {
       throw createHttpError(404, "Chapter not found!");
     }
 
-    await Lesson.deleteMany({ chapter: chapter._id });
-    await chapter.deleteOne();
-
-    return chapter;
+    return chapterAdminRepository.deleteWithChildren(id);
   },
 };
