@@ -30,6 +30,7 @@ export type GetAllInstructorRequestQuery = {
   phone?: string;
 };
 
+// ! ─── Request Types ────────────────────────────────────────────
 export interface UpdateInstructorRequestStatus {
   userId: number;
   status: InstructorRequestStatus;

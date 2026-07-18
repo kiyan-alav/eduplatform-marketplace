@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import createHttpError from "http-errors";
+import { NotificationType } from "../../../generated/prisma/enums";
+import { notificationService } from "../../notification/notification.service";
 import { UpdateProfileInput } from "../user.validation";
 import { userRepository } from "./user.repository";
-import { notificationService } from "../../notification/notification.service";
-import { NotificationType } from "../../../generated/prisma/enums";
 
 export const userService = {
   async updateProfile(
@@ -75,10 +75,8 @@ export const userService = {
 
   async applyForInstructor(userId: number, documents: string[]) {
     try {
-      const instructorProfile = await userRepository.createInstructorApplication(
-        userId,
-        documents,
-      );
+      const instructorProfile =
+        await userRepository.createInstructorApplication(userId, documents);
 
       await notificationService.create({
         user: userId,

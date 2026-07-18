@@ -12,20 +12,12 @@ export const updateProfileSchema = z
       .object({
         bio: z.string().max(1000).optional(),
         expertise: z.array(z.string()).optional(),
-        socialLinks: z
-          .object({
-            website: z.url().optional(),
-            instagram: z.string().optional(),
-            linkedin: z.string().optional(),
-          })
-          .optional(),
-        payoutInfo: z
-          .object({
-            bankAccount: z.string().optional(),
-            cardNumber: z.string().optional(),
-            sheba: z.string().optional(),
-          })
-          .optional(),
+        website: z.url().optional(),
+        instagram: z.string().optional(),
+        linkedin: z.string().optional(),
+        bankAccount: z.string().optional(),
+        cardNumber: z.string().optional(),
+        sheba: z.string().optional(),
       })
       .optional(),
   })

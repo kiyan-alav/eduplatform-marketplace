@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
-import { InstructorRequestQuerySchema, UserListQuerySchema } from "../user.filter";
+import {
+  InstructorRequestQuerySchema,
+  UserListQuerySchema,
+} from "../user.filter";
 import { adminUserService } from "./user.admin.service";
 
 export const adminUserController = {

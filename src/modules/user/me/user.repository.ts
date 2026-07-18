@@ -1,5 +1,9 @@
 import { prisma } from "../../../configs/prisma";
-import { InstructorRequestStatus, Prisma, UserRole } from "../../../generated/prisma/client";
+import {
+  InstructorRequestStatus,
+  Prisma,
+  UserRole,
+} from "../../../generated/prisma/client";
 
 export const userRepository = {
   async findUserById(userId: number) {
