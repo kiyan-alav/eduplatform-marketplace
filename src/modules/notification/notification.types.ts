@@ -14,7 +14,7 @@ export type GetAllNotificationQuery = {
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface CreateNotificationInput {
-  user: number;
+  userId: number;
   title: string;
   description?: string;
   type: NotificationType;

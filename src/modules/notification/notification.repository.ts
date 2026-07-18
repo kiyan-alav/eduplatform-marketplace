@@ -13,15 +13,11 @@ export const notificationRepository = {
     const { skip, take } = buildPagination({ limit, page });
 
     const where: Prisma.NotificationWhereInput = {
-      ...(isRead && {
-        isRead: {
-          equals: isRead,
-        },
+      ...(isRead !== undefined && {
+        isRead,
       }),
       ...(type && {
-        type: {
-          equals: type,
-        },
+        type,
       }),
       userId: userId,
     };
@@ -65,10 +61,20 @@ export const notificationRepository = {
   },
 
   async markAsRead(userId: number, notificationId: number) {
+    const notification = await prisma.notification.findFirst({
+      where: {
+        id: notificationId,
+        userId,
+      },
+    });
+
+    if (!notification) {
+      return null;
+    }
+
     return prisma.notification.update({
       where: {
         id: notificationId,
-        userId: userId,
       },
       data: {
         isRead: true,
@@ -90,13 +96,13 @@ export const notificationRepository = {
     });
   },
 
-  async create({ title, type, user, description }: CreateNotificationInput) {
+  async create({ title, type, userId, description }: CreateNotificationInput) {
     return prisma.notification.create({
       data: {
         title,
         type,
         description: description || null,
-        userId: user,
+        userId,
       },
     });
   },

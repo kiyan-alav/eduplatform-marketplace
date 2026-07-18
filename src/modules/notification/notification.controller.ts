@@ -4,6 +4,7 @@ import { buildApiResponse } from "../../types/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { NotificationListQuerySchema } from "./notification.filter";
 import { notificationService } from "./notification.service";
+import { paramsSchema } from "../../configs/jwt";
 
 export const notificationController = {
   getAll: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -16,7 +17,7 @@ export const notificationController = {
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: notificationData.totalDocs,
+      data: notificationData.items,
       meta: {
         limit: notificationData.limit,
         page: notificationData.page as number,
@@ -45,9 +46,9 @@ export const notificationController = {
   }),
 
   markAsRead: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const notificationId = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const notification = await notificationService.markAsRead(
-      +notificationId,
+      id,
       +req.user!.userId,
     );
 

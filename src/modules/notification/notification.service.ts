@@ -9,7 +9,7 @@ export const notificationService = {
     return await notificationRepository.create({
       title: data.title,
       description: data.description,
-      user: data.user,
+      userId: data.userId,
       type: data.type,
     });
   },

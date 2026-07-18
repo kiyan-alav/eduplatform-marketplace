@@ -3,6 +3,7 @@ import { authGuard } from "../../middlewares/auth.middleware";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { notificationController } from "./notification.controller";
 import { NotificationListQuerySchema } from "./notification.filter";
+import { paramsSchema } from "../../configs/jwt";
 
 const notificationRouter = Router();
 
@@ -22,6 +23,7 @@ notificationRouter.get(
 notificationRouter.patch(
   "/:id/mark-as-read",
   authGuard,
+  validateRequest(paramsSchema, "params"),
   notificationController.markAsRead,
 );
 

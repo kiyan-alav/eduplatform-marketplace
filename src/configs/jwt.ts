@@ -41,5 +41,5 @@ export const verifyPassword = async (pass: string, hashPass: string) => {
 };
 
 export const paramsSchema = z.object({
-  id: z.coerce.number().int(),
+  id: z.coerce.number().int().positive(),
 });

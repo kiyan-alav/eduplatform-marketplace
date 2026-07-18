@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import {
@@ -30,9 +31,9 @@ export const adminUserController = {
   }),
 
   singleUser: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
 
-    const user = await adminUserService.singleUser(+id);
+    const user = await adminUserService.singleUser(id);
 
     const response = buildApiResponse({
       success: true,
@@ -66,9 +67,9 @@ export const adminUserController = {
   }),
 
   applyRequests: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
 
-    const data = await adminUserService.applyInstructorRequest(+id);
+    const data = await adminUserService.applyInstructorRequest(id);
 
     const response = buildApiResponse({
       success: true,
@@ -80,9 +81,9 @@ export const adminUserController = {
   }),
 
   rejectRequests: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
 
-    const data = await adminUserService.rejectInstructorRequest(+id);
+    const data = await adminUserService.rejectInstructorRequest(id);
 
     const response = buildApiResponse({
       success: true,
