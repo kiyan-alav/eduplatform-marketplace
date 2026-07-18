@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { CategoryListQuerySchema } from "../category.filter";
 import { categoryAdminService } from "./category.admin.service";
 
 export const categoryAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const categoryData = await categoryAdminService.getAll(req.query);
+    const query = CategoryListQuerySchema.parse(req.query);
+    const categoryData = await categoryAdminService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: categoryData.docs,
+      data: categoryData.items,
       meta: {
         limit: categoryData.limit,
         page: categoryData.page as number,
@@ -37,7 +40,7 @@ export const categoryAdminController = {
   }),
 
   update: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const category = await categoryAdminService.update(id, req.body);
 
     const response = buildApiResponse({
@@ -50,7 +53,7 @@ export const categoryAdminController = {
   }),
 
   delete: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const category = await categoryAdminService.delete(id);
 
     const response = buildApiResponse({

@@ -1,22 +1,21 @@
 import createHttpError from "http-errors";
 import slugify from "slugify";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { categoryFilterConfig } from "../category.filter";
-import { Category } from "../category.model";
 import {
-  ICategoryFilter,
+  CategoryListQuery,
   ICreateCategoryRequest,
   IUpdateCategoryRequest,
 } from "../category.types";
+import { adminCategoryRepository } from "./category.admin.repository";
 
 export const categoryAdminService = {
-  async getAll(filters: ICategoryFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      categoryFilterConfig,
-    );
+  async getAll(query: CategoryListQuery) {
+    const { page, limit, name } = query;
 
-    const result = await Category.paginate(mongoFilter, options);
+    const result = await adminCategoryRepository.getAll({
+      page,
+      limit,
+      name,
+    });
 
     return result;
   },
@@ -24,7 +23,7 @@ export const categoryAdminService = {
   async create(data: ICreateCategoryRequest) {
     const name = data.name.trim();
 
-    const rawSlug = data.slug?.trim() || name;
+    const rawSlug = data.slug.trim();
 
     const slug = slugify(rawSlug, {
       lower: true,
@@ -32,22 +31,20 @@ export const categoryAdminService = {
       trim: true,
     });
 
-    const isExist = await Category.findOne({
-      $or: [{ name: name.toLowerCase() }, { slug }],
-    });
+    const isExist = await adminCategoryRepository.findByNameOrSlug(name, slug);
 
     if (isExist) {
       throw createHttpError(409, "Category exists!");
     }
 
-    return await Category.create({
+    return await adminCategoryRepository.create({
       name,
       slug,
     });
   },
 
-  async update(id: string, data: IUpdateCategoryRequest) {
-    const category = await Category.findById(id);
+  async update(id: number, data: IUpdateCategoryRequest) {
+    const category = await adminCategoryRepository.findById(id);
 
     if (!category) {
       throw createHttpError(404, "Category not found!");
@@ -77,27 +74,21 @@ export const categoryAdminService = {
       return category;
     }
 
-    if (updateDoc.name || updateDoc.slug) {
-      const conditions = [];
-      if (updateDoc.name)
-        conditions.push({ name: updateDoc.name.toLowerCase() });
-      if (updateDoc.slug) conditions.push({ slug: updateDoc.slug });
+    const conflict = await adminCategoryRepository.findByNameOrSlugExceptId(
+      id,
+      updateDoc.name,
+      updateDoc.slug,
+    );
 
-      const conflict = await Category.findOne({
-        _id: { $ne: id },
-        $or: conditions,
-      });
-
-      if (conflict) throw createHttpError(409, "Category exists!");
+    if (conflict) {
+      throw createHttpError(409, "Category exists!");
     }
 
-    return Category.findByIdAndUpdate(id, updateDoc, {
-      returnDocument: "after",
-    });
+    return adminCategoryRepository.update(id, updateDoc);
   },
 
-  async delete(id: string) {
-    const deleted = await Category.findByIdAndDelete(id);
+  async delete(id: number) {
+    const deleted = await adminCategoryRepository.delete(id);
 
     if (!deleted) {
       throw createHttpError(404, "Category not found!");

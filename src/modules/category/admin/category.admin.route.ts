@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { paramsSchema } from "../../../configs/jwt";
+import { UserRole } from "../../../generated/prisma/enums";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
-import { UserRole } from "../../user/user.types";
 import { CategoryListQuerySchema } from "../category.filter";
 import {
   createCategorySchema,

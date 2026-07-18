@@ -1,13 +1,13 @@
-type PaginationParams = {
+export interface PaginationParams {
   page: number;
   limit: number;
-};
+}
 
-type PaginationMeta = {
+interface PaginationMeta {
   totalDocs: number;
   limit: number;
   page: number;
-};
+}
 
 export function buildPagination({ page, limit }: PaginationParams) {
   const skip = (page - 1) * limit;

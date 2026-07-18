@@ -1,16 +1,15 @@
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { categoryFilterConfig } from "../category.filter";
-import { Category } from "../category.model";
-import { ICategoryFilter } from "../category.types";
+import { CategoryListQuery } from "../category.types";
+import { categoryRepository } from "./category.repository";
 
 export const categoryService = {
-  async getAll(filters: ICategoryFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      categoryFilterConfig,
-    );
+  async getAll(query: CategoryListQuery) {
+    const { page, limit, name } = query;
 
-    const result = await Category.paginate(mongoFilter, options);
+    const result = await categoryRepository.getAll({
+      page,
+      limit,
+      name,
+    });
 
     return result;
   },

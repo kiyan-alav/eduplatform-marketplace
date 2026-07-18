@@ -1,27 +1,18 @@
-import { Document, PaginateModel } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
+import { z } from "zod";
+import { CategoryListQuerySchema } from "./category.filter";
+import { PaginationParams } from "../../types/buildPagination";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface ICategoryFilter extends CustomQueryOptions {
+export type CategoryListQuery = z.infer<typeof CategoryListQuerySchema>;
+
+export interface GetAllCategoryQuery extends PaginationParams {
   name?: string;
-}
-
-// ! ─── Core Types ────────────────────────────────────────────
-export interface ICategory {
-  name: string;
-  slug: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface ICategoryDocument extends ICategory, Document {}
-
-export interface ICategoryPaginateModel extends PaginateModel<ICategoryDocument> {}
+};
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateCategoryRequest {
   name: string;
-  slug?: string;
+  slug: string;
 }
 
 export interface IUpdateCategoryRequest {

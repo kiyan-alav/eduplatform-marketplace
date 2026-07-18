@@ -7,6 +7,7 @@ import {
   InstructorRequestQuerySchema,
   UserListQuerySchema,
 } from "./user.filter";
+import { PaginationParams } from "../../types/buildPagination";
 
 // ! ─── Filter Types ────────────────────────────────────────────
 export type UserListQuery = z.infer<typeof UserListQuerySchema>;
@@ -15,17 +16,13 @@ export type InstructorRequestQuery = z.infer<
   typeof InstructorRequestQuerySchema
 >;
 
-export type GetAllUserQuery = {
-  page: number;
-  limit: number;
+export interface GetAllUserQuery extends PaginationParams {
   email?: string;
   phone?: string;
   role?: string;
 };
 
-export type GetAllInstructorRequestQuery = {
-  page: number;
-  limit: number;
+export interface GetAllInstructorRequestQuery extends PaginationParams {
   email?: string;
   phone?: string;
 };
