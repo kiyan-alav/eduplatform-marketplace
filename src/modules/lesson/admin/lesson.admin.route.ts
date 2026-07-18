@@ -3,10 +3,10 @@ import { paramsSchema } from "../../../configs/jwt";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
-import { UserRole } from "../../user/user.types";
-import { LessonListQuerySchema } from "../leeson.filter";
-import { createLessonSchema, updateLessonSchema } from "../leeson.validation";
+import { LessonListQuerySchema } from "../lesson.filter";
+import { createLessonSchema, updateLessonSchema } from "../lesson.validation";
 import { lessonAdminController } from "./lesson.admin.controller";
+import { UserRole } from "../../../generated/prisma/enums";
 
 const lessonAdminRouter = Router();
 

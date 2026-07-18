@@ -1,187 +1,131 @@
 import createHttpError from "http-errors";
-import { startSession, Types } from "mongoose";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { Chapter } from "../../chapter/chapter.model";
-import { Course } from "../../course/course.model";
-import { InstructorProfile } from "../../user/profiles/instructor/instructor.model";
-import { lessonFilterConfig } from "../leeson.filter";
-import { Lesson } from "../lesson.model";
 import {
   ICreateLessonRequest,
-  ILessonFilter,
   IUpdateLessonRequest,
+  LessonListQuery,
 } from "../lesson.types";
+import { userLessonRepository } from "./lesson.user.repository";
 
-const getInstructorProfile = async (userId: string) => {
-  const instructor = await InstructorProfile.findOne({ user: userId }).select(
-    "_id",
-  );
+const getInstructorCourseIds = async (userId: number): Promise<number[]> => {
+  const instructor =
+    await userLessonRepository.findInstructorProfileByUserId(userId);
 
   if (!instructor) {
     throw createHttpError(
       403,
-      "You are not authorized to manage chapters. You must be an instructor.",
+      "You are not authorized to manage lessons. You must be an instructor.",
     );
   }
 
-  return instructor._id;
-};
+  const courses =
+    await userLessonRepository.findInstructorCoursesByInstructorId(
+      instructor.id,
+    );
 
-const getInstructorCourseIds = async (instructorId: Types.ObjectId) => {
-  const courses = await Course.find({ instructor: instructorId })
-    .select("_id")
-    .lean();
-  return courses.map((course) => course._id.toString());
+  return courses.map((course) => course.id);
 };
 
 const validateChapterOwnership = async (
-  chapterId: string | Types.ObjectId,
-  instructorCourseIds: string[],
+  chapterId: number,
+  instructorCourseIds: number[],
 ) => {
-  const chapter = await Chapter.findById(chapterId).select("course");
+  const chapter = await userLessonRepository.findChapterById(chapterId);
+
   if (!chapter) {
     throw createHttpError(404, "Chapter not found!");
   }
-  if (!instructorCourseIds.includes(chapter.course.toString())) {
+
+  if (!instructorCourseIds.includes(chapter.courseId)) {
     throw createHttpError(403, "You are not authorized to access this chapter");
   }
+
   return chapter;
 };
 
 export const lessonUserService = {
-  async getAll(filters: ILessonFilter, userId?: string) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      lessonFilterConfig,
+  async getAll(query: LessonListQuery, userId: number) {
+    const instructorCourseIds = await getInstructorCourseIds(userId);
+
+    let allowedChapterIds: number[] = [];
+
+    if (query.chapterId) {
+      await validateChapterOwnership(query.chapterId, instructorCourseIds);
+      allowedChapterIds = [query.chapterId];
+    } else {
+      if (instructorCourseIds.length > 0) {
+        const chapters =
+          await userLessonRepository.findChaptersByCourseIds(
+            instructorCourseIds,
+          );
+        allowedChapterIds = chapters.map((c) => c.id);
+      }
+    }
+
+    return userLessonRepository.getAll(query, allowedChapterIds);
+  },
+
+  async getOne(id: number, userId: number) {
+    const lesson = await userLessonRepository.findById(id);
+
+    if (!lesson) {
+      throw createHttpError(404, "Lesson not found!");
+    }
+
+    const instructorCourseIds = await getInstructorCourseIds(userId);
+
+    await validateChapterOwnership(lesson.chapterId, instructorCourseIds);
+
+    return lesson;
+  },
+
+  async create(data: ICreateLessonRequest, userId: number) {
+    const instructorCourseIds = await getInstructorCourseIds(userId);
+
+    await validateChapterOwnership(data.chapterId, instructorCourseIds);
+
+    const lastLesson = await userLessonRepository.findLastLessonInChapter(
+      data.chapterId,
     );
 
-    const instructorId = await getInstructorProfile(userId || "");
-    const instructorCourseIds = await getInstructorCourseIds(instructorId);
+    const nextOrder = lastLesson ? lastLesson.order + 1 : 1;
 
-    if (mongoFilter.chapter) {
-      await validateChapterOwnership(mongoFilter.chapter, instructorCourseIds);
-    } else {
-      const allowedChapters = await Chapter.find({
-        course: { $in: instructorCourseIds },
-      }).select("_id");
-      const allowedChapterIds = allowedChapters.map((c) => c._id);
-      mongoFilter.chapter = { $in: allowedChapterIds };
-    }
-
-    options.populate = [{ path: "chapter", select: "title" }];
-    options.sort = { order: 1 };
-
-    return Lesson.paginate(mongoFilter, options);
+    return userLessonRepository.create({
+      title: data.title.trim(),
+      chapterId: data.chapterId,
+      duration: data.duration,
+      order: nextOrder,
+    });
   },
 
-  async getOne(id: string, userId?: string) {
-    const lesson = await Lesson.findById(id);
+  async edit(id: number, data: IUpdateLessonRequest, userId: number) {
+    const lesson = await userLessonRepository.findById(id);
 
     if (!lesson) {
       throw createHttpError(404, "Lesson not found!");
     }
 
-    const instructorId = await getInstructorProfile(userId || "");
-    const instructorCourseIds = await getInstructorCourseIds(instructorId);
+    const instructorCourseIds = await getInstructorCourseIds(userId);
 
-    await validateChapterOwnership(lesson.chapter, instructorCourseIds);
+    await validateChapterOwnership(lesson.chapterId, instructorCourseIds);
 
-    return lesson.populate({ path: "course", select: "title" });
-  },
-
-  async create(data: ICreateLessonRequest, userId?: string) {
-    const instructorId = await getInstructorProfile(userId || "");
-    const instructorCourseIds = await getInstructorCourseIds(instructorId);
-
-    if (!Types.ObjectId.isValid(data.chapter)) {
-      throw createHttpError(400, "Invalid chapter id");
+    if (data.chapterId !== undefined) {
+      await validateChapterOwnership(data.chapterId, instructorCourseIds);
     }
 
-    await validateChapterOwnership(data.chapter, instructorCourseIds);
-
-    const session = await startSession();
-    session.startTransaction();
-
-    try {
-      const lastLesson = await Lesson.findOne({ course: data.chapter })
-        .sort({ order: -1 })
-        .session(session);
-
-      const nextOrder = lastLesson ? lastLesson.order + 1 : 1;
-
-      const lesson = new Lesson({
-        title: data.title.trim(),
-        chapter: new Types.ObjectId(data.chapter),
-        order: nextOrder,
-        duration: data.duration,
-        // videoPath: data.videoPath || null,
-      });
-
-      await lesson.save({ session });
-
-      await session.commitTransaction();
-      session.endSession();
-
-      return lesson;
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw error;
-    }
+    return userLessonRepository.update(id, data);
   },
 
-  async edit(id: string, data: IUpdateLessonRequest, userId?: string) {
-    const lesson = await Lesson.findById(id);
+  async delete(id: number, userId: number) {
+    const lesson = await userLessonRepository.findById(id);
 
     if (!lesson) {
       throw createHttpError(404, "Lesson not found!");
     }
 
-    const instructorId = await getInstructorProfile(userId || "");
-    const instructorCourseIds = await getInstructorCourseIds(instructorId);
+    const instructorCourseIds = await getInstructorCourseIds(userId);
 
-    await validateChapterOwnership(lesson.chapter, instructorCourseIds);
+    await validateChapterOwnership(lesson.chapterId, instructorCourseIds);
 
-    if (typeof data.title === "string") {
-      lesson.title = data.title.trim();
-    }
-
-    if (typeof data.order === "number") {
-      lesson.order = data.order;
-    }
-
-    if (typeof data.duration === "number") {
-      lesson.duration = data.duration;
-    }
-
-    if (typeof data.chapter === "string") {
-      if (!Types.ObjectId.isValid(data.chapter)) {
-        throw createHttpError(400, "Invalid chapter id");
-      }
-
-      await validateChapterOwnership(data.chapter, instructorCourseIds);
-      lesson.chapter = new Types.ObjectId(data.chapter);
-    }
-
-    await lesson.save();
-
-    return lesson;
-  },
-
-  async delete(id: string, userId?: string) {
-    const lesson = await Lesson.findById(id);
-
-    if (!lesson) {
-      throw createHttpError(404, "Lesson not found!");
-    }
-
-    const instructorId = await getInstructorProfile(userId || "");
-    const instructorCourseIds = await getInstructorCourseIds(instructorId);
-
-    await validateChapterOwnership(lesson.chapter, instructorCourseIds);
-
-    await lesson.deleteOne();
-
-    return lesson;
+    return userLessonRepository.delete(id);
   },
 };

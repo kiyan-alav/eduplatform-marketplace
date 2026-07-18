@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { LessonListQuerySchema } from "../lesson.filter";
 import { lessonAdminService } from "./lesson.admin.service";
+import { paramsSchema } from "../../../configs/jwt";
 
 export const lessonAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const lessonData = await lessonAdminService.getAll(req.query);
+    const query = LessonListQuerySchema.parse(req.query);
+    const lessonData = await lessonAdminService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: lessonData.docs,
+      data: lessonData.items,
       meta: {
         limit: lessonData.limit,
         page: lessonData.page as number,
@@ -25,7 +28,7 @@ export const lessonAdminController = {
   }),
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const lesson = await lessonAdminService.getOne(id);
 
     const response = buildApiResponse({
@@ -50,7 +53,7 @@ export const lessonAdminController = {
   }),
 
   edit: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const lesson = await lessonAdminService.edit(id, req.body);
 
     const response = buildApiResponse({
@@ -63,7 +66,7 @@ export const lessonAdminController = {
   }),
 
   delete: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const lesson = await lessonAdminService.delete(id);
 
     const response = buildApiResponse({

@@ -1,15 +1,15 @@
 import { Router } from "express";
 import { paramsSchema } from "../../../configs/jwt";
+import { UserRole } from "../../../generated/prisma/enums";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import {
   isVerifiedInstructor,
   roleGuard,
 } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
-import { UserRole } from "../../user/user.types";
-import { LessonListQuerySchema } from "../leeson.filter";
+import { LessonListQuerySchema } from "../lesson.filter";
+import { createLessonSchema, updateLessonSchema } from "../lesson.validation";
 import { lessonUserController } from "./lesson.user.controller";
-import { createLessonSchema, updateLessonSchema } from "../leeson.validation";
 
 const lessonUserRouter = Router();
 

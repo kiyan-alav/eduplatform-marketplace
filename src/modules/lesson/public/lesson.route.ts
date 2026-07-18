@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { paramsSchema } from "../../../configs/jwt";
 import { validateRequest } from "../../../middlewares/validateRequest";
-import { LessonListQuerySchema } from "../leeson.filter";
+import { LessonListQuerySchema } from "../lesson.filter";
 import { lessonController } from "./lesson.controller";
 
 const lessonRouter = Router();

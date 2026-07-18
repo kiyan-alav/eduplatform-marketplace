@@ -1,32 +1,20 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
-
-// ! ─── Core Types ────────────────────────────────────────────
-export interface ILesson {
-  title: string;
-  chapter: Types.ObjectId;
-  duration: number;
-  videoPath: string;
-  order: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface ILessonDocument extends ILesson, Document {}
-
-export interface ILessonPaginateModel extends PaginateModel<ILessonDocument> {}
+import { z } from "zod";
+import { PaginationParams } from "../../types/buildPagination";
+import { LessonListQuerySchema } from "./lesson.filter";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface ILessonFilter extends CustomQueryOptions {
+export type LessonListQuery = z.infer<typeof LessonListQuerySchema>;
+
+export interface GetAllLessonsQuery extends PaginationParams {
   title?: string;
-  chapter?: string;
-  course?: string;
+  courseId?: number;
+  chapterId?: number;
 }
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateLessonRequest {
   title: string;
-  chapter: string;
+  chapterId: number;
   duration: number;
   // videoPath?: string;
   order: number;
@@ -34,7 +22,7 @@ export interface ICreateLessonRequest {
 
 export interface IUpdateLessonRequest {
   title?: string;
-  chapter?: string;
+  chapterId?: number;
   duration?: number;
   // videoPath?: string;
   order?: number;

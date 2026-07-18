@@ -1,41 +1,18 @@
 import createHttpError from "http-errors";
-import { startSession, Types } from "mongoose";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { lessonFilterConfig } from "../leeson.filter";
-import { Lesson } from "../lesson.model";
 import {
+  GetAllLessonsQuery,
   ICreateLessonRequest,
-  ILessonFilter,
   IUpdateLessonRequest,
 } from "../lesson.types";
+import { lessonAdminRepository } from "./lesson.admin.repository";
 
 export const lessonAdminService = {
-  async getAll(filters: ILessonFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      lessonFilterConfig,
-    );
-    options.populate = [
-      {
-        path: "chapter",
-        select: "title totalDuration",
-        populate: { path: "course", select: "_id title" },
-      },
-    ];
-    options.sort = { order: 1 };
-
-    return Lesson.paginate(mongoFilter, options);
+  async getAll(filters: GetAllLessonsQuery) {
+    return lessonAdminRepository.getAll(filters);
   },
 
-  async getOne(id: string) {
-    const lesson = await Lesson.findById(id).populate({
-      path: "chapter",
-      select: "title totalDuration",
-      populate: {
-        path: "course",
-        select: "_id title",
-      },
-    });
+  async getOne(id: number) {
+    const lesson = await lessonAdminRepository.findById(id);
 
     if (!lesson) {
       throw createHttpError(404, "Lesson not found!");
@@ -45,83 +22,48 @@ export const lessonAdminService = {
   },
 
   async create(data: ICreateLessonRequest) {
-    const title = data.title.trim();
+    const chapter = await lessonAdminRepository.findChapterById(data.chapterId);
 
-    if (!Types.ObjectId.isValid(data.chapter)) {
-      throw createHttpError(400, "Invalid chapter id");
+    if (!chapter) {
+      throw createHttpError(404, "Chapter not found!");
     }
 
-    const chapterId = new Types.ObjectId(data.chapter);
+    const lastLesson = await lessonAdminRepository.findLastLessonInChapter(
+      data.chapterId,
+    );
 
-    const session = await startSession();
-    session.startTransaction();
+    const nextOrder = lastLesson ? lastLesson.order + 1 : 1;
 
-    try {
-      const lastLesson = await Lesson.findOne({ chapter: chapterId })
-        .sort({ order: -1 })
-        .session(session);
-
-      const nextOrder = lastLesson ? lastLesson.order + 1 : 1;
-
-      const lesson = new Lesson({
-        title,
-        chapter: chapterId,
-        order: nextOrder,
-        duration: data.duration,
-        // videoPath: data.videoPath || null,
-      });
-
-      await lesson.save({ session });
-
-      await session.commitTransaction();
-      session.endSession();
-
-      return lesson;
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw error;
-    }
+    return lessonAdminRepository.create(data, nextOrder);
   },
 
-  async edit(id: string, data: IUpdateLessonRequest) {
-    const lesson = await Lesson.findById(id);
+  async edit(id: number, data: IUpdateLessonRequest) {
+    const lesson = await lessonAdminRepository.findById(id);
 
     if (!lesson) {
       throw createHttpError(404, "Lesson not found!");
     }
 
-    if (typeof data.title === "string") {
-      lesson.title = data.title.trim();
-    }
+    if (data.chapterId !== undefined) {
+      const chapter = await lessonAdminRepository.findChapterById(
+        data.chapterId,
+      );
 
-    if (typeof data.order === "number") {
-      lesson.order = data.order;
-    }
-
-    if (typeof data.chapter === "string") {
-      if (!Types.ObjectId.isValid(data.chapter)) {
-        throw createHttpError(400, "Invalid chapter id");
+      if (!chapter) {
+        throw createHttpError(404, "Chapter not found!");
       }
-
-      lesson.chapter = new Types.ObjectId(data.chapter);
     }
 
-    await lesson.save();
-
-    return lesson;
+    return lessonAdminRepository.update(id, data);
   },
 
-  async delete(id: string) {
-    const lesson = await Lesson.findById(id);
+  async delete(id: number) {
+    const lesson = await lessonAdminRepository.findById(id);
 
     if (!lesson) {
       throw createHttpError(404, "Lesson not found!");
     }
 
-    await Lesson.deleteMany({ chapter: lesson._id });
-    await lesson.deleteOne();
-
-    return lesson;
+    return lessonAdminRepository.delete(id);
   },
 };
