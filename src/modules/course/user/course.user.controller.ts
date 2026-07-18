@@ -1,20 +1,21 @@
 import { Request, Response } from "express";
 import { ENV } from "../../../configs/env";
+import { paramsSchema } from "../../../configs/jwt";
 import { AuthRequest } from "../../../middlewares/auth.middleware";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { CourseListQuerySchema } from "../course.filter";
 import { courseUserService } from "./course.user.service";
 
 export const courseUserController = {
   getAll: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.userId;
-
-    const courseData = await courseUserService.getAll(req.query, userId);
+    const query = CourseListQuerySchema.parse(req.query);
+    const courseData = await courseUserService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: courseData.docs,
+      data: courseData.items,
       meta: {
         limit: courseData.limit,
         page: courseData.page as number,
@@ -29,10 +30,11 @@ export const courseUserController = {
   }),
 
   getOne: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.userId;
+    const userId = req.user?.userId as string;
 
-    const id = req.params.id as string;
-    const course = await courseUserService.getOne(id, userId);
+    const { id } = paramsSchema.parse(req.params);
+
+    const course = await courseUserService.getOne(id, +userId as number);
 
     const response = buildApiResponse({
       success: true,
@@ -65,7 +67,7 @@ export const courseUserController = {
   }),
 
   edit: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
 
     const cover = req.file
       ? `${ENV.BASE_URL}/public/courses/covers/${req.file.filename}`
@@ -88,7 +90,7 @@ export const courseUserController = {
   }),
 
   delete: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const course = await courseUserService.delete(id);
 
     const response = buildApiResponse({

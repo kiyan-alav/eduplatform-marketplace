@@ -1,52 +1,18 @@
 import createHttpError from "http-errors";
-import { Types } from "mongoose";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { Chapter } from "../../chapter/chapter.model";
-import { Lesson } from "../../lesson/lesson.model";
-import { courseFilterConfig } from "../course.filter";
-import { Course } from "../course.model";
 import {
-  ICourseFilter,
+  GetAllCourseQuery,
   ICreateCourseRequest,
   IUpdateCourseRequest,
 } from "../course.types";
+import { adminCourseRepository } from "./course.admin.repository";
 
 export const courseAdminService = {
-  async getAll(filters: ICourseFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      courseFilterConfig,
-    );
-
-    options.populate = [
-      { path: "category", select: "name" },
-      {
-        path: "instructor",
-        select: "verification.isVerified verification.status _id",
-        populate: {
-          path: "user",
-          select: "fullName email phone _id avatar",
-        },
-      },
-    ];
-
-    const result = await Course.paginate(mongoFilter, options);
-
-    return result;
+  async getAll(query: GetAllCourseQuery) {
+    return adminCourseRepository.getAll(query);
   },
 
-  async getOne(id: string) {
-    const course = await Course.findById(id).populate([
-      { path: "category", select: "-createdAt -updatedAt -__v" },
-      {
-        path: "instructor",
-        select: "-createdAt -updatedAt -__v",
-        populate: {
-          path: "user",
-          select: "-createdAt -updatedAt -__v",
-        },
-      },
-    ]);
+  async getOne(id: number) {
+    const course = await adminCourseRepository.findByIdWithRelations(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
@@ -56,92 +22,35 @@ export const courseAdminService = {
   },
 
   async create(data: ICreateCourseRequest, cover?: string) {
-    const title = data.title.trim();
-    const description = data.description?.trim();
-
-    const instructorId = new Types.ObjectId(data.instructor);
-    const categoryId = new Types.ObjectId(data.category);
-
-    return await Course.create({
-      title,
-      description,
-      instructor: instructorId,
-      price: data.price,
-      level: data.level,
-      category: categoryId,
-      cover: cover || null,
-      isPublished: true,
-    });
+    return adminCourseRepository.create(data, cover);
   },
 
-  async edit(id: string, data: IUpdateCourseRequest, cover?: string) {
-    const course = await Course.findById(id);
+  async edit(id: number, data: IUpdateCourseRequest, cover?: string) {
+    const course = await adminCourseRepository.findById(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
     }
 
-    if (typeof data.title === "string") course.title = data.title.trim();
-
-    if (typeof data.description === "string")
-      course.description = data.description.trim();
-
-    if (typeof data.category === "string") {
-      if (!Types.ObjectId.isValid(data.category)) {
-        throw createHttpError(400, "Invalid category id");
-      }
-      course.category = new Types.ObjectId(data.category);
-    }
-
-    if (typeof data.instructor === "string") {
-      if (!Types.ObjectId.isValid(data.instructor)) {
-        throw createHttpError(400, "Invalid instructor id");
-      }
-      course.instructor = new Types.ObjectId(data.instructor);
-    }
-
-    if (data.price !== undefined) course.price = data.price;
-
-    if (data.level) course.level = data.level;
-
-    if (typeof cover === "string") course.cover = cover;
-
-    await course.save();
-
-    return course;
+    return adminCourseRepository.update(id, data, cover);
   },
 
-  async delete(id: string) {
-    const course = await Course.findById(id);
+  async delete(id: number) {
+    const course = await adminCourseRepository.findById(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
     }
 
-    const chapters = await Chapter.find({ course: course._id })
-      .select("_id")
-      .lean();
-    const chapterIds = chapters.map((chapter) => chapter._id);
-
-    if (chapterIds.length > 0) {
-      await Lesson.deleteMany({ chapter: { $in: chapterIds } });
-    }
-
-    await Chapter.deleteMany({ course: course._id });
-    await course.deleteOne();
-
-    return course;
+    return adminCourseRepository.deleteWithRelations(id);
   },
 
-  async togglePublish(id: string) {
-    const course = await Course.findById(id);
+  async togglePublish(id: number) {
+    const course = await adminCourseRepository.togglePublish(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
     }
-
-    course.isPublished = !course.isPublished;
-    await course.save();
 
     return course;
   },

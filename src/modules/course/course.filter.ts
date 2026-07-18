@@ -1,21 +1,11 @@
 import { z } from "zod";
-import { PaginationSchema } from "../../utils/baseFilterSchema";
-import { FilterConfig } from "../../utils/query-builder";
-import { ICourseFilter, LevelType } from "./course.types";
+import { LevelType } from "../../generated/prisma/enums";
+import { BaseListQuerySchema } from "../../utils/baseFilterSchema";
 
-export const courseFilterConfig: FilterConfig<ICourseFilter> = {
-  searchable: ["title"],
-  regex: ["title"],
-  exact: ["level", "isPublished", "instructor", "category"],
-  enumList: [],
-};
-
-export const CourseListQuerySchema = PaginationSchema.extend({
+export const CourseListQuerySchema = BaseListQuerySchema.extend({
   title: z.string().optional(),
-  instructor: z.string().optional(),
-  category: z.string().optional(),
-  level: z
-    .enum([LevelType.BEGINNER, LevelType.INTERMEDIATE, LevelType.ADVANCED])
-    .optional(),
+  instructorId: z.coerce.number().int().positive().optional(),
+  categoryId: z.coerce.number().int().positive().optional(),
+  level: z.enum(LevelType).optional(),
   isPublished: z.coerce.boolean().optional(),
 });

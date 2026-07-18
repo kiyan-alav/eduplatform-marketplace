@@ -3,15 +3,18 @@ import { ENV } from "../../../configs/env";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import { courseAdminService } from "./course.admin.service";
+import { CourseListQuerySchema } from "../course.filter";
+import { paramsSchema } from "../../../configs/jwt";
 
 export const courseAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const courseData = await courseAdminService.getAll(req.query);
+    const query = CourseListQuerySchema.parse(req.query);
+    const courseData = await courseAdminService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: courseData.docs,
+      data: courseData.items,
       meta: {
         limit: courseData.limit,
         page: courseData.page as number,
@@ -26,7 +29,7 @@ export const courseAdminController = {
   }),
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const course = await courseAdminService.getOne(id);
 
     const response = buildApiResponse({
@@ -55,7 +58,7 @@ export const courseAdminController = {
   }),
 
   edit: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
 
     const cover = req.file
       ? `${ENV.BASE_URL}/public/courses/covers/${req.file.filename}`
@@ -73,7 +76,7 @@ export const courseAdminController = {
   }),
 
   delete: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const course = await courseAdminService.delete(id);
 
     const response = buildApiResponse({
@@ -86,7 +89,7 @@ export const courseAdminController = {
   }),
 
   togglePublish: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const course = await courseAdminService.togglePublish(id);
 
     const response = buildApiResponse({

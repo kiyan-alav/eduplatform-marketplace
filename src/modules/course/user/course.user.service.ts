@@ -1,76 +1,28 @@
 import createHttpError from "http-errors";
-import { Types } from "mongoose";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { Chapter } from "../../chapter/chapter.model";
-import { Lesson } from "../../lesson/lesson.model";
+import { NotificationType } from "../../../generated/prisma/enums";
 import { notificationService } from "../../notification/notification.service";
-import { NotificationType } from "../../notification/notification.types";
-import { InstructorProfile } from "../../user/profiles/instructor/instructor.model";
-import { courseFilterConfig } from "../course.filter";
-import { Course } from "../course.model";
 import {
-  ICourseFilter,
+  CourseListQuery,
   ICreateCourseRequest,
   IUpdateCourseRequest,
 } from "../course.types";
+import { userCourseRepository } from "./course.user.repository";
 
 export const courseUserService = {
-  async getAll(filters: ICourseFilter, userId?: string) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      courseFilterConfig,
-    );
-
-    if (userId) {
-      const instructor = await InstructorProfile.findOne({
-        user: userId,
-      }).select("_id");
-
-      if (!instructor) {
-        throw createHttpError(404, "Instructor not found!");
-      }
-
-      mongoFilter.instructor = instructor._id;
-    }
-
-    options.populate = [
-      { path: "category", select: "name" },
-      {
-        path: "instructor",
-        select: "verification.isVerified verification.status _id",
-        populate: {
-          path: "user",
-          select: "fullName email phone _id avatar",
-        },
-      },
-    ];
-
-    const result = await Course.paginate(mongoFilter, options);
-
-    return result;
+  async getAll(query: CourseListQuery) {
+    return userCourseRepository.getAll(query);
   },
 
-  async getOne(id: string, userId?: string) {
-    const course = await Course.findById(id).populate([
-      { path: "category", select: "-createdAt -updatedAt -__v" },
-      {
-        path: "instructor",
-        select: "-createdAt -updatedAt -__v",
-        populate: {
-          path: "user",
-          select: "-createdAt -updatedAt -__v",
-        },
-      },
-    ]);
+  async getOne(id: number, userId?: number) {
+    const course = await userCourseRepository.findByIdWithRelations(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
     }
 
     if (userId) {
-      const instructor = await InstructorProfile.findOne({
-        user: userId,
-      }).select("_id");
+      const instructor =
+        await userCourseRepository.findInstructorProfileByUserId(userId);
 
       if (!instructor) {
         throw createHttpError(
@@ -79,7 +31,7 @@ export const courseUserService = {
         );
       }
 
-      if (course.instructor._id.toString() !== instructor._id.toString()) {
+      if (course.instructorId !== instructor.id) {
         throw createHttpError(
           403,
           "You are not authorized to access this course!",
@@ -94,9 +46,8 @@ export const courseUserService = {
     const title = data.title.trim();
     const description = data.description?.trim();
 
-    const instructorProfile = await InstructorProfile.findOne({
-      user: data.instructor,
-    }).select("_id");
+    const instructorProfile =
+      await userCourseRepository.findInstructorProfileByUserId(data.instructor);
 
     if (!instructorProfile) {
       throw createHttpError(
@@ -105,91 +56,49 @@ export const courseUserService = {
       );
     }
 
-    const instructorId = instructorProfile._id;
-
-    const categoryId = new Types.ObjectId(data.category);
-
-    if (data.instructor) {
-      const otherInstructorProfile = await InstructorProfile.findOne({
-        user: data.instructor,
-      }).select("_id");
-      if (!otherInstructorProfile) {
-        throw createHttpError(
-          400,
-          "Instructor not found for the specified user.",
-        );
-      }
-      throw createHttpError(403, "You can only create courses for yourself.");
-    }
+    const course = await userCourseRepository.create({
+      title,
+      description,
+      instructor: data.instructor,
+      price: data.price,
+      level: data.level,
+      category: data.category,
+      cover,
+    });
 
     await notificationService.create({
-      user: instructorId.toString(),
+      userId: data.instructor,
       title: "Your course has been created",
       description:
         "After review, your course will be published and available for students.",
       type: NotificationType.SUCCESS,
     });
 
-    return await Course.create({
-      title,
-      description,
-      instructor: instructorId,
-      price: data.price,
-      level: data.level,
-      category: categoryId,
-      cover: cover || null,
+    return course;
+  },
+
+  async edit(id: number, data: IUpdateCourseRequest, cover?: string) {
+    const course = await userCourseRepository.findById(id);
+
+    if (!course) {
+      throw createHttpError(404, "Course not found!");
+    }
+
+    const updatedCourse = await userCourseRepository.update(id, {
+      ...data,
+      cover,
     });
+
+    return updatedCourse;
   },
 
-  async edit(id: string, data: IUpdateCourseRequest, cover?: string) {
-    const course = await Course.findById(id);
+  async delete(id: number) {
+    const course = await userCourseRepository.findById(id);
 
     if (!course) {
       throw createHttpError(404, "Course not found!");
     }
 
-    if (typeof data.title === "string") course.title = data.title.trim();
-
-    if (typeof data.description === "string")
-      course.description = data.description.trim();
-
-    if (typeof data.category === "string") {
-      if (!Types.ObjectId.isValid(data.category)) {
-        throw createHttpError(400, "Invalid category id");
-      }
-      course.category = new Types.ObjectId(data.category);
-    }
-
-    if (data.price !== undefined) course.price = data.price;
-
-    if (data.level) course.level = data.level;
-
-    if (typeof cover === "string") course.cover = cover;
-
-    await course.save();
-
-    return course;
-  },
-
-  async delete(id: string) {
-    const course = await Course.findById(id);
-
-    if (!course) {
-      throw createHttpError(404, "Course not found!");
-    }
-
-    const chapters = await Chapter.find({ course: course._id })
-      .select("_id")
-      .lean();
-    const chapterIds = chapters.map((chapter) => chapter._id);
-
-    if (chapterIds.length > 0) {
-      await Lesson.deleteMany({ chapter: { $in: chapterIds } });
-    }
-
-    await Chapter.deleteMany({ course: course._id });
-    await course.deleteOne();
-
-    return course;
+    return userCourseRepository.deleteWithChildren(id);
   },
 };

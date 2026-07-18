@@ -7,13 +7,13 @@ import {
 } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
 import { coursesCoverUpload } from "../../../utils/multer";
-import { UserRole } from "../../user/user.types";
 import { CourseListQuerySchema } from "../course.filter";
 import {
   createInstructorCourseSchema,
   updateInstructorCourseSchema,
 } from "../course.validation";
 import { courseUserController } from "./course.user.controller";
+import { UserRole } from "../../../generated/prisma/enums";
 
 const courseUserRouter = Router();
 

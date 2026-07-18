@@ -4,13 +4,13 @@ import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
 import { coursesCoverUpload } from "../../../utils/multer";
-import { UserRole } from "../../user/user.types";
 import { CourseListQuerySchema } from "../course.filter";
 import {
   createAdminCourseSchema,
   updateAdminCourseSchema,
 } from "../course.validation";
 import { courseAdminController } from "./course.admin.controller";
+import { UserRole } from "../../../generated/prisma/enums";
 
 const courseAdminRouter = Router();
 

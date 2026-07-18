@@ -1,57 +1,34 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
-
-// ! ─── Enum Types ────────────────────────────────────────────
-export enum LevelType {
-  BEGINNER = "BEGINNER",
-  INTERMEDIATE = "INTERMEDIATE",
-  ADVANCED = "ADVANCED",
-}
+import { z } from "zod";
+import { LevelType } from "../../generated/prisma/enums";
+import { PaginationParams } from "../../types/buildPagination";
+import { CourseListQuerySchema } from "./course.filter";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface ICourseFilter extends CustomQueryOptions {
+export type CourseListQuery = z.infer<typeof CourseListQuerySchema>;
+
+export interface GetAllCourseQuery extends PaginationParams {
   title?: string;
-  instructor?: string;
-  category?: string;
+  instructorId?: number;
+  categoryId?: number;
   level?: LevelType;
   isPublished?: boolean;
 }
-
-// ! ─── Core Types ────────────────────────────────────────────
-export interface ICourse {
-  title: string;
-  description: string;
-  instructor: Types.ObjectId;
-  price: number;
-  level: LevelType;
-  category: Types.ObjectId;
-  isPublished: boolean;
-  cover: string | null;
-  avgRating: number;
-  ratingCount: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface ICourseDocument extends ICourse, Document {}
-
-export interface ICoursePaginateModel extends PaginateModel<ICourseDocument> {}
 
 // ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateCourseRequest {
   title: string;
   description: string;
-  instructor: string;
+  instructor: number;
   price: number;
   level: LevelType;
-  category: string;
+  category: number;
 }
 
 export interface IUpdateCourseRequest {
   title?: string;
   description?: string;
-  instructor?: string;
+  instructor?: number;
   price?: number;
   level?: LevelType;
-  category?: string;
+  category?: number;
 }

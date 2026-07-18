@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { CourseListQuerySchema } from "../course.filter";
 import { courseService } from "./course.service";
 
 export const courseController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const courseData = await courseService.getAll(req.query);
+    const query = CourseListQuerySchema.parse(req.query);
+    const courseData = await courseService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: courseData.docs,
+      data: courseData.items,
       meta: {
         limit: courseData.limit,
         page: courseData.page as number,
@@ -25,7 +28,7 @@ export const courseController = {
   }),
 
   getOne: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = paramsSchema.parse(req.params);
     const course = await courseService.getOne(id);
 
     const response = buildApiResponse({
