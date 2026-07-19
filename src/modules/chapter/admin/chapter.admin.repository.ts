@@ -4,7 +4,11 @@ import {
   buildPagination,
   paginationMeta,
 } from "../../../types/buildPagination";
-import { GetAllChapterQuery, ICreateChapterRequest, IUpdateChapterRequest } from "../chapter.types";
+import {
+  GetAllChapterQuery,
+  ICreateChapterRequest,
+  IUpdateChapterRequest,
+} from "../chapter.types";
 
 export const chapterAdminRepository = {
   async getAll(params: GetAllChapterQuery) {
@@ -121,6 +125,9 @@ export const chapterAdminRepository = {
 
   async deleteWithChildren(id: number) {
     return prisma.$transaction(async (tx) => {
+      const chapter = await tx.chapter.findUnique({ where: { id } });
+      if (!chapter) throw new Error("Not found");
+
       await tx.lesson.deleteMany({
         where: { chapterId: id },
       });
