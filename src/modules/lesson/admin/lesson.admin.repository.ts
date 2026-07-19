@@ -1,14 +1,7 @@
 import { prisma } from "../../../configs/prisma";
 import { Prisma } from "../../../generated/prisma/client";
-import {
-  buildPagination,
-  paginationMeta,
-} from "../../../types/buildPagination";
-import {
-  GetAllLessonsQuery,
-  ICreateLessonRequest,
-  IUpdateLessonRequest,
-} from "../lesson.types";
+import { buildPagination, paginationMeta } from "../../../types/buildPagination";
+import { GetAllLessonsQuery, ICreateLessonRequest, IUpdateLessonRequest } from "../lesson.types";
 
 export const lessonAdminRepository = {
   async getAll(params: GetAllLessonsQuery) {
@@ -16,38 +9,20 @@ export const lessonAdminRepository = {
     const { skip, take } = buildPagination({ limit, page });
 
     const where: Prisma.LessonWhereInput = {
-      ...(title && {
-        title: {
-          contains: title,
-          mode: "insensitive",
-        },
-      }),
+      ...(title && { title: { contains: title, mode: "insensitive" } }),
       ...(chapterId && { chapterId }),
-      ...(courseId && {
-        chapter: {
-          courseId,
-        },
-      }),
+      ...(courseId && { chapter: { courseId } }),
     };
 
     const [items, totalDocs] = await prisma.$transaction([
       prisma.lesson.findMany({
-        where,
-        skip,
-        take,
+        where, skip, take,
         orderBy: { order: "asc" },
         include: {
           chapter: {
             select: {
-              id: true,
-              title: true,
-              totalDuration: true,
-              course: {
-                select: {
-                  id: true,
-                  title: true,
-                },
-              },
+              id: true, title: true, totalDuration: true,
+              course: { select: { id: true, title: true } },
             },
           },
         },
@@ -55,21 +30,8 @@ export const lessonAdminRepository = {
       prisma.lesson.count({ where }),
     ]);
 
-    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({
-      limit,
-      page,
-      totalDocs,
-    });
-
-    return {
-      items,
-      page,
-      limit,
-      totalDocs,
-      totalPages,
-      hasNextPage,
-      hasPrevPage,
-    };
+    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({ limit, page, totalDocs });
+    return { items, page, limit, totalDocs, totalPages, hasNextPage, hasPrevPage };
   },
 
   async findById(id: number) {
@@ -78,15 +40,8 @@ export const lessonAdminRepository = {
       include: {
         chapter: {
           select: {
-            id: true,
-            title: true,
-            totalDuration: true,
-            course: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
+            id: true, title: true, totalDuration: true,
+            course: { select: { id: true, title: true } },
           },
         },
       },
@@ -94,78 +49,96 @@ export const lessonAdminRepository = {
   },
 
   async findChapterById(chapterId: number) {
-    return prisma.chapter.findUnique({
-      where: { id: chapterId },
-      select: {
-        id: true,
-      },
-    });
+    return prisma.chapter.findUnique({ where: { id: chapterId }, select: { id: true } });
   },
 
   async findLastLessonInChapter(chapterId: number) {
-    return prisma.lesson.findFirst({
-      where: { chapterId },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
+    return prisma.lesson.findFirst({ where: { chapterId }, orderBy: { order: "desc" }, select: { order: true } });
   },
 
-  async create(data: ICreateLessonRequest, order: number) {
-    return prisma.lesson.create({
-      data: {
-        title: data.title.trim(),
-        chapterId: data.chapterId,
-        duration: data.duration,
-        order,
-      },
-      include: {
-        chapter: {
-          select: {
-            id: true,
-            title: true,
-            totalDuration: true,
-            course: {
-              select: {
-                id: true,
-                title: true,
-              },
+  async createAndRecalculateDuration(data: ICreateLessonRequest, order: number) {
+    return prisma.$transaction(async (tx) => {
+      const lesson = await tx.lesson.create({
+        data: { title: data.title.trim(), chapterId: data.chapterId, duration: data.duration, order },
+        include: {
+          chapter: {
+            select: {
+              id: true, title: true, totalDuration: true,
+              course: { select: { id: true, title: true } },
             },
           },
         },
-      },
+      });
+
+      const aggResult = await tx.lesson.aggregate({
+        where: { chapterId: data.chapterId },
+        _sum: { duration: true },
+      });
+
+      await tx.chapter.update({
+        where: { id: data.chapterId },
+        data: { totalDuration: aggResult._sum.duration ?? 0 },
+      });
+
+      return lesson;
     });
   },
 
-  async update(id: number, data: IUpdateLessonRequest) {
-    return prisma.lesson.update({
-      where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title.trim() }),
-        ...(data.chapterId !== undefined && { chapterId: data.chapterId }),
-        ...(data.duration !== undefined && { duration: data.duration }),
-        ...(data.order !== undefined && { order: data.order }),
-      },
-      include: {
-        chapter: {
-          select: {
-            id: true,
-            title: true,
-            totalDuration: true,
-            course: {
-              select: {
-                id: true,
-                title: true,
-              },
+  async updateAndRecalculateDuration(id: number, data: IUpdateLessonRequest) {
+    return prisma.$transaction(async (tx) => {
+      const lesson = await tx.lesson.update({
+        where: { id },
+        data: {
+          ...(data.title !== undefined && { title: data.title.trim() }),
+          ...(data.chapterId !== undefined && { chapterId: data.chapterId }),
+          ...(data.duration !== undefined && { duration: data.duration }),
+          ...(data.order !== undefined && { order: data.order }),
+        },
+        include: {
+          chapter: {
+            select: {
+              id: true, title: true, totalDuration: true,
+              course: { select: { id: true, title: true } },
             },
           },
         },
-      },
+      });
+
+      const chaptersToUpdate = new Set<number>([lesson.chapterId]);
+      if (data.chapterId !== undefined && data.chapterId !== lesson.chapterId) {
+        chaptersToUpdate.add(data.chapterId);
+      }
+
+      for (const chId of chaptersToUpdate) {
+        const aggResult = await tx.lesson.aggregate({
+          where: { chapterId: chId },
+          _sum: { duration: true },
+        });
+        await tx.chapter.update({
+          where: { id: chId },
+          data: { totalDuration: aggResult._sum.duration ?? 0 },
+        });
+      }
+
+      return lesson;
     });
   },
 
-  async delete(id: number) {
-    return prisma.lesson.delete({
-      where: { id },
+  async deleteAndRecalculateDuration(id: number) {
+    return prisma.$transaction(async (tx) => {
+      const lesson = await tx.lesson.delete({ where: { id } });
+
+      const aggResult = await tx.lesson.aggregate({
+        where: { chapterId: lesson.chapterId },
+        _sum: { duration: true },
+      });
+
+      await tx.chapter.update({
+        where: { id: lesson.chapterId },
+        data: { totalDuration: aggResult._sum.duration ?? 0 },
+      });
+
+      return lesson;
     });
   },
 };

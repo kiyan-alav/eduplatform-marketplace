@@ -1,5 +1,4 @@
 import createHttpError from "http-errors";
-import { updateCourseRating } from "../../../utils/updateCourseRating";
 import { ICreateRatingRequest } from "../rating.types";
 import { ratingUserRepository } from "./rating.user.repository";
 
@@ -13,9 +12,7 @@ export const userRatingService = {
       throw createHttpError(409, "You have already rated this course!");
     }
 
-    const rating = await ratingUserRepository.create(data);
-    await updateCourseRating(data.courseId);
-    return rating;
+    return ratingUserRepository.createAndRecalculate(data);
   },
 
   async deleteRating(id: number, userId: number) {
@@ -24,7 +21,6 @@ export const userRatingService = {
     if (rating.userId !== userId) {
       throw createHttpError(403, "You can only delete your own ratings!");
     }
-    await ratingUserRepository.delete(id);
-    await updateCourseRating(rating.courseId);
+    return ratingUserRepository.deleteAndRecalculate(id);
   },
 };
