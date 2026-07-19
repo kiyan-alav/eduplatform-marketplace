@@ -2,9 +2,8 @@ import { z } from "zod";
 
 export const createEnrollmentSchema = z
   .object({
-    student: z.string().min(1, "Student id is required"),
-    course: z.string().min(1, "Course id is required"),
-    paid: z.coerce.number().optional(),
-    paidAt: z.date().optional(),
+    courseId: z.coerce.number("Course id is required").int().positive(),
+    paid: z.coerce.number().min(0, "Paid amount must be at least 0"),
+    paidAt: z.coerce.date(),
   })
   .strict();

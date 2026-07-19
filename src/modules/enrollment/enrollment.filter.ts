@@ -1,15 +1,7 @@
 import { z } from "zod";
-import { PaginationSchema } from "../../utils/baseFilterSchema";
-import { FilterConfig } from "../../utils/query-builder";
-import { IEnrollmentFilter } from "./enrollment.types";
+import { BaseListQuerySchema } from "../../utils/baseFilterSchema";
 
-export const enrollmentFilterConfig: FilterConfig<IEnrollmentFilter> = {
-  searchable: [],
-  regex: [],
-  exact: ["course"],
-  enumList: [],
-};
-
-export const EnrollmentListQuerySchema = PaginationSchema.extend({
-  course: z.string().optional(),
+export const EnrollmentListQuerySchema = BaseListQuerySchema.extend({
+  courseId: z.coerce.number().int().positive().optional(),
+  studentId: z.coerce.number().int().positive().optional(),
 });

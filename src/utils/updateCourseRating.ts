@@ -1,35 +1,19 @@
-import { Types } from "mongoose";
-import { Course } from "../modules/course/course.model";
-import { Rating } from "../modules/rating/rating.model";
+import { prisma } from "../configs/prisma";
 
-export async function updateCourseRating(courseId: Types.ObjectId) {
-  const result = await Rating.aggregate([
-    {
-      $match: { course: courseId },
-    },
-    {
-      $group: {
-        _id: "$course",
-        averageRating: { $avg: "$score" },
-        ratingCount: { $sum: 1 },
-      },
-    },
-  ]);
+export async function updateCourseRating(courseId: number) {
+  const result = await prisma.rating.aggregate({
+    where: { courseId, isApproved: true },
+    _avg: { score: true },
+    _count: { id: true },
+  });
 
-  if (result.length === 0) {
-    await Course.findByIdAndUpdate(courseId, {
-      $set: {
-        averageRating: 0,
-        ratingCount: 0,
-      },
-    });
-    return;
-  }
+  const avgRating = result._avg.score
+    ? Number(result._avg.score.toFixed(1))
+    : 0;
+  const ratingCount = result._count.id;
 
-  await Course.findByIdAndUpdate(courseId, {
-    $set: {
-      averageRating: Number(result[0].averageRating.toFixed(1)),
-      ratingCount: result[0].ratingCount,
-    },
+  await prisma.course.update({
+    where: { id: courseId },
+    data: { avgRating, ratingCount },
   });
 }

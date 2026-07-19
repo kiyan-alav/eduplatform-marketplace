@@ -1,11 +1,16 @@
 import { Router } from "express";
+import { z } from "zod";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
-import { UserRole } from "../../user/user.types";
+import { UserRole } from "../../../generated/prisma/enums";
 import { validateRequest } from "../../../middlewares/validateRequest";
 import { EnrollmentListQuerySchema } from "../enrollment.filter";
 import { enrollmentAdminController } from "./enrollment.admin.controller";
-import { paramsSchema } from "../../../configs/jwt";
+
+const enrollmentParamsSchema = z.object({
+  studentId: z.coerce.number().int().positive(),
+  courseId: z.coerce.number().int().positive(),
+});
 
 const adminEnrollmentRouter = Router();
 
@@ -18,10 +23,10 @@ adminEnrollmentRouter.get(
 );
 
 adminEnrollmentRouter.get(
-  "/:id",
+  "/:studentId/:courseId",
   authGuard,
   roleGuard([UserRole.ADMIN]),
-  validateRequest(paramsSchema, "params"),
+  validateRequest(enrollmentParamsSchema, "params"),
   enrollmentAdminController.getOne,
 );
 

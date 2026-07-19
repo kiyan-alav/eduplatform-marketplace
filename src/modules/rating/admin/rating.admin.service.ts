@@ -1,33 +1,23 @@
 import createHttpError from "http-errors";
-import { buildQueryFilters } from "../../../utils/query-builder";
-import { ratingFilterConfig } from "../rating.filter";
-import { Rating } from "../rating.model";
-import { IRatingFilter } from "../rating.types";
+import { updateCourseRating } from "../../../utils/updateCourseRating";
+import { GetAllRatingsQuery } from "../rating.types";
+import { ratingAdminRepository } from "./rating.admin.repository";
 
 export const adminRatingService = {
-  async getAll(filters: IRatingFilter) {
-    const { mongoFilter, options } = buildQueryFilters(
-      filters,
-      ratingFilterConfig,
-    );
-
-    const results = await Rating.paginate(mongoFilter, options);
-    return results;
+  async getAll(filters: GetAllRatingsQuery) {
+    return ratingAdminRepository.getAll(filters);
   },
 
-  async delete(ratingId: string) {
-    const rating = await Rating.findOneAndDelete({ _id: ratingId });
-    if (!rating) {
-      throw createHttpError(404, "Rating not found!");
-    }
+  async delete(ratingId: number) {
+    const rating = await ratingAdminRepository.findById(ratingId);
+    if (!rating) throw createHttpError(404, "Rating not found!");
+    await ratingAdminRepository.delete(ratingId);
+    await updateCourseRating(rating.courseId);
   },
 
-  async toggleVisibility(ratingId: string) {
-    const rating = await Rating.findById(ratingId);
-    if (!rating) {
-      throw createHttpError(404, "Rating not found!");
-    }
-    rating.isApproved = !rating.isApproved;
-    await rating.save();
+  async toggleVisibility(ratingId: number) {
+    const rating = await ratingAdminRepository.toggleVisibility(ratingId);
+    if (!rating) throw createHttpError(404, "Rating not found!");
+    await updateCourseRating(rating.courseId);
   },
 };

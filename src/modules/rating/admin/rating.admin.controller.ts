@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { RatingListQuerySchema } from "../rating.filter";
 import { adminRatingService } from "./rating.admin.service";
 
 export const ratingAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const ratingData = await adminRatingService.getAll(req.query);
+    const query = RatingListQuerySchema.parse(req.query);
+    const ratingData = await adminRatingService.getAll(query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: ratingData.docs,
+      data: ratingData.items,
       meta: {
         limit: ratingData.limit,
         page: ratingData.page as number,
@@ -25,8 +28,8 @@ export const ratingAdminController = {
   }),
 
   delete: asyncHandler(async (req: Request, res: Response) => {
-    const ratingId = req.params.id as string;
-    await adminRatingService.delete(ratingId);
+    const { id } = paramsSchema.parse(req.params);
+    await adminRatingService.delete(id);
 
     const response = buildApiResponse({
       success: true,
@@ -37,8 +40,8 @@ export const ratingAdminController = {
   }),
 
   toggleVisibility: asyncHandler(async (req: Request, res: Response) => {
-    const ratingId = req.params.id as string;
-    await adminRatingService.toggleVisibility(ratingId);
+    const { id } = paramsSchema.parse(req.params);
+    await adminRatingService.toggleVisibility(id);
 
     const response = buildApiResponse({
       success: true,

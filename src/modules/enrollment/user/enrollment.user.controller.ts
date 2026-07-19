@@ -2,21 +2,19 @@ import { Response } from "express";
 import { AuthRequest } from "../../../middlewares/auth.middleware";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import { EnrollmentListQuerySchema } from "../enrollment.filter";
 import { enrollmentUserService } from "./enrollment.user.service";
 
 export const enrollmentUserController = {
   getAll: asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId as string;
-
-    const enrollmentData = await enrollmentUserService.getAll(
-      userId,
-      req.query,
-    );
+    const query = EnrollmentListQuerySchema.parse(req.query);
+    const enrollmentData = await enrollmentUserService.getAll(+userId, query);
 
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: enrollmentData.docs,
+      data: enrollmentData.items,
       meta: {
         limit: enrollmentData.limit,
         page: enrollmentData.page as number,
@@ -32,8 +30,8 @@ export const enrollmentUserController = {
 
   getOne: asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId as string;
-    const id = req.params.id as string;
-    const enrollment = await enrollmentUserService.getOne(userId, id);
+    const courseId = Number(req.params.courseId);
+    const enrollment = await enrollmentUserService.getOne(+userId, courseId);
 
     const response = buildApiResponse({
       success: true,
@@ -46,13 +44,7 @@ export const enrollmentUserController = {
 
   create: asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId as string;
-
-    const bodyData = {
-      ...req.body,
-      student: userId,
-    };
-
-    const enrollment = await enrollmentUserService.create(userId, bodyData);
+    const enrollment = await enrollmentUserService.create(+userId, req.body);
 
     const response = buildApiResponse({
       success: true,

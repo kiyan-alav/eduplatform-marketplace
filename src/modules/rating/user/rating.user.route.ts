@@ -13,6 +13,7 @@ ratingUserRouter.post(
   validateRequest(createRatingSchema, "body"),
   userRatingController.createRating,
 );
+
 ratingUserRouter.delete(
   "/:id/delete",
   authGuard,

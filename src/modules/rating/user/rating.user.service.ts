@@ -1,19 +1,30 @@
 import createHttpError from "http-errors";
-import { Rating } from "../rating.model";
+import { updateCourseRating } from "../../../utils/updateCourseRating";
 import { ICreateRatingRequest } from "../rating.types";
+import { ratingUserRepository } from "./rating.user.repository";
 
 export const userRatingService = {
   async createRating(data: ICreateRatingRequest) {
-    const rating = new Rating(data);
-    await rating.save();
+    const existing = await ratingUserRepository.findExistingRating(
+      data.userId,
+      data.courseId,
+    );
+    if (existing) {
+      throw createHttpError(409, "You have already rated this course!");
+    }
 
+    const rating = await ratingUserRepository.create(data);
+    await updateCourseRating(data.courseId);
     return rating;
   },
 
-  async deleteRating(id: string) {
-    const rating = await Rating.findOneAndDelete({ _id: id });
-    if (!rating) {
-      throw createHttpError(404, "Rating not found!");
+  async deleteRating(id: number, userId: number) {
+    const rating = await ratingUserRepository.findById(id);
+    if (!rating) throw createHttpError(404, "Rating not found!");
+    if (rating.userId !== userId) {
+      throw createHttpError(403, "You can only delete your own ratings!");
     }
+    await ratingUserRepository.delete(id);
+    await updateCourseRating(rating.courseId);
   },
 };

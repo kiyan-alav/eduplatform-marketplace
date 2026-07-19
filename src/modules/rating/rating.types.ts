@@ -1,30 +1,19 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
+import { z } from "zod";
+import { PaginationParams } from "../../types/buildPagination";
+import { RatingListQuerySchema } from "./rating.filter";
 
 // ! ─── Filter Types ────────────────────────────────────────────
-export interface IRatingFilter extends CustomQueryOptions {
+export type RatingListQuery = z.infer<typeof RatingListQuerySchema>;
+
+export interface GetAllRatingsQuery extends PaginationParams {
+  courseId?: number;
   isApproved?: boolean;
 }
 
-// ! ─── Core Types ────────────────────────────────────────────
-export interface IRating {
-  user: Types.ObjectId;
-  course: Types.ObjectId;
-  score: number;
-  description: string;
-  isApproved: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface IRatingDocument extends IRating, Document {}
-
-export interface IRatingPaginateModel extends PaginateModel<IRatingDocument> {}
-
 // ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateRatingRequest {
-  user: string;
-  course: string;
+  userId: number;
+  courseId: number;
   score: number;
   description?: string;
 }

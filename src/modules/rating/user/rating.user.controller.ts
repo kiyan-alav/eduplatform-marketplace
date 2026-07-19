@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { paramsSchema } from "../../../configs/jwt";
 import { AuthRequest } from "../../../middlewares/auth.middleware";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
@@ -6,12 +7,12 @@ import { userRatingService } from "./rating.user.service";
 
 export const userRatingController = {
   createRating: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { userId } = req.user!;
-    const { course, score, description } = req.body;
+    const userId = req.user!.userId as string;
+    const { courseId, score, description } = req.body;
 
     const rating = await userRatingService.createRating({
-      user: userId,
-      course,
+      userId: +userId,
+      courseId,
       score,
       description,
     });
@@ -25,10 +26,10 @@ export const userRatingController = {
     res.status(201).json(response);
   }),
 
-  deleteRating: asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
-
-    await userRatingService.deleteRating(id);
+  deleteRating: asyncHandler(async (req: AuthRequest, res: Response) => {
+    const userId = req.user!.userId as string;
+    const { id } = paramsSchema.parse(req.params);
+    await userRatingService.deleteRating(id, +userId);
 
     const response = buildApiResponse({
       message: "Rating deleted successfully",

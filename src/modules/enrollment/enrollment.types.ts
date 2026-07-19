@@ -1,29 +1,17 @@
-import { Document, PaginateModel, Types } from "mongoose";
-import { CustomQueryOptions } from "../../utils/query-builder";
+import { z } from "zod";
+import { PaginationParams } from "../../types/buildPagination";
+import { EnrollmentListQuerySchema } from "./enrollment.filter";
 
-// ! ─── Filter Types ────────────────────────────────────────────
-export interface IEnrollmentFilter extends CustomQueryOptions {
-  course?: string;
+export type EnrollmentListQuery = z.infer<typeof EnrollmentListQuerySchema>;
+
+export interface GetAllEnrollmentsQuery extends PaginationParams {
+  courseId?: number;
+  studentId?: number;
 }
 
-// ! ─── Core Types ────────────────────────────────────────────
-export interface IEnrollment {
-  student: Types.ObjectId;
-  course: Types.ObjectId;
-  paid: number;
-  paidAt: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface IEnrollmentDocument extends IEnrollment, Document {}
-
-export interface IEnrollmentPaginateModel extends PaginateModel<IEnrollmentDocument> {}
-
-// ! ─── Request Types ────────────────────────────────────────────
 export interface ICreateEnrollmentRequest {
-  student: string;
-  course: string;
+  studentId: number;
+  courseId: number;
   paid: number;
   paidAt: Date;
 }
