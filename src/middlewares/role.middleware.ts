@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import createHttpError from "http-errors";
+import { prisma } from "../configs/prisma";
 import { UserRole } from "../generated/prisma/enums";
-import { InstructorProfile } from "../modules/user/profiles/instructor/instructor.model";
 import { AuthRequest } from "./auth.middleware";
 
 type ConditionFn = (req: AuthRequest) => Promise<boolean>;
@@ -37,8 +37,10 @@ export const roleGuard = (roles: UserRole[] = [], condition?: ConditionFn) => {
 };
 
 export const isVerifiedInstructor: ConditionFn = async (req) => {
-  const instructor = await InstructorProfile.findOne({
-    user: req.user!.userId,
+  const instructor = await prisma.instructorProfile.findUnique({
+    where: {
+      userId: +req.user!.userId,
+    },
   });
-  return !!instructor?.verification.isVerified;
+  return !!instructor?.isVerified;
 };

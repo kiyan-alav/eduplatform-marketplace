@@ -1,4 +1,4 @@
-import { Application } from "express";
+import type { Application } from "express";
 import { middleware as openApiValidator } from "express-openapi-validator";
 import fs from "fs";
 import YAML from "js-yaml";
@@ -6,37 +6,59 @@ import path from "path";
 import swaggerUi from "swagger-ui-express";
 import { logger } from "../configs/logger";
 
+const swaggerDir = import.meta.dirname;
+
 const loadYamlFile = (filePath: string) => {
-  return YAML.load(fs.readFileSync(path.resolve(filePath), "utf8"));
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Swagger YAML file not found: ${filePath}`);
+  }
+
+  return YAML.load(fs.readFileSync(filePath, "utf8"));
 };
 
 const deepMerge = (target: any, source: any) => {
   for (const key of Object.keys(source)) {
-    if (source[key] instanceof Object && key in target) {
+    if (
+      source[key] instanceof Object &&
+      target[key] instanceof Object &&
+      key in target
+    ) {
       Object.assign(source[key], deepMerge(target[key], source[key]));
     }
   }
-  return { ...target, ...source };
+
+  return {
+    ...target,
+    ...source,
+  };
 };
 
 const mergeComponents = (target: any, source: any) => {
-  if (!source.components) return target;
-  target.components = target.components || {};
+  if (!source.components) {
+    return target;
+  }
+
+  target.components ??= {};
+
   for (const section of Object.keys(source.components)) {
     target.components[section] = {
       ...target.components[section],
       ...source.components[section],
     };
   }
+
   return target;
 };
 
 export const setupSwagger = (app: Application) => {
-  let swaggerDoc: any = loadYamlFile(path.join(__dirname, "swagger.base.yaml"));
-
-  const componentsDir = path.join(__dirname, "components");
+  const swaggerBasePath = path.join(swaggerDir, "swagger.base.yaml");
+  const componentsDir = path.join(swaggerDir, "components");
   const schemasDir = path.join(componentsDir, "schemas");
   const modulesDir = path.join(componentsDir, "modules");
+
+  logger.info(`Loading Swagger from: ${swaggerBasePath}`);
+
+  let swaggerDoc: any = loadYamlFile(swaggerBasePath);
 
   swaggerDoc = mergeComponents(
     swaggerDoc,

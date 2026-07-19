@@ -14,6 +14,5 @@ components:
           type: string
           example: Something went wrong
         data:
-          type: "null"
           nullable: true
           example: null

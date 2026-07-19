@@ -10,6 +10,8 @@ export const SortSchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
-export const BaseListQuerySchema = PaginationSchema.extend(SortSchema).extend({
+export const BaseListQuerySchema = z.object({
+  ...PaginationSchema.shape,
+  ...SortSchema.shape,
   search: z.string().trim().optional(),
 });
