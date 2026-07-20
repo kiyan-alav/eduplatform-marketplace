@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { logger } from "../../../configs/logger";
 import {
   ChapterListQuery,
   ICreateChapterRequest,
@@ -16,6 +17,8 @@ const getInstructorCourseIds = async (userId: number) => {
       "You are not authorized to manage chapters. You must be an instructor.",
     );
   }
+
+  logger.info(instructor);
 
   const courses =
     await userChapterRepository.findInstructorCoursesByInstructorId(

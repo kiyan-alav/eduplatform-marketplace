@@ -44,7 +44,7 @@ export const ratingUserRepository = {
       });
 
       const aggResult = await tx.rating.aggregate({
-        where: { courseId: data.courseId, isApproved: true },
+        where: { courseId: data.courseId },
         _avg: { score: true },
         _count: { id: true },
       });

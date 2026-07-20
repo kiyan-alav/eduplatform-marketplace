@@ -17,20 +17,20 @@ ratingAdminRouter.get(
   ratingAdminController.getAll,
 );
 
-ratingAdminRouter.delete(
-  "/:id",
-  authGuard,
-  roleGuard([UserRole.ADMIN]),
-  validateRequest(paramsSchema, "params"),
-  ratingAdminController.delete,
-);
-
 ratingAdminRouter.patch(
   "/:id/toggle-visibility",
   authGuard,
   roleGuard([UserRole.ADMIN]),
   validateRequest(paramsSchema, "params"),
   ratingAdminController.toggleVisibility,
+);
+
+ratingAdminRouter.delete(
+  "/:id",
+  authGuard,
+  roleGuard([UserRole.ADMIN]),
+  validateRequest(paramsSchema, "params"),
+  ratingAdminController.delete,
 );
 
 export default ratingAdminRouter;

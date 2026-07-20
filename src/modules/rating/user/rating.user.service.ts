@@ -8,7 +8,7 @@ export const userRatingService = {
       data.userId,
       data.courseId,
     );
-    
+
     if (existing) {
       throw createHttpError(409, "You have already rated this course!");
     }

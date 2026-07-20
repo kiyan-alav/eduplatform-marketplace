@@ -25,8 +25,9 @@ const router = Router();
 router.use("/auth", authRouter);
 
 router.use("/user", userRouter);
-router.use("/user/notification", notificationRouter);
 router.use("/admin/user", adminUserRouter);
+
+router.use("/user/notification", notificationRouter);
 
 router.use("/category", categoryRouter);
 router.use("/admin/category", categoryAdminRouter);
@@ -46,6 +47,7 @@ router.use("/admin/course", courseAdminRouter);
 router.use("/rating", ratingRouter);
 router.use("/user/rating", ratingUserRouter);
 router.use("/admin/rating", ratingAdminRouter);
+
 router.use("/student/enrollment", userEnrollmentRouter);
 router.use("/admin/enrollment", adminEnrollmentRouter);
 

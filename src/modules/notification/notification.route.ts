@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { paramsSchema } from "../../configs/jwt";
 import { authGuard } from "../../middlewares/auth.middleware";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { notificationController } from "./notification.controller";
 import { NotificationListQuerySchema } from "./notification.filter";
-import { paramsSchema } from "../../configs/jwt";
 
 const notificationRouter = Router();
 

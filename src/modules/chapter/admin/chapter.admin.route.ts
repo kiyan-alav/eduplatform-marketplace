@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { paramsSchema } from "../../../configs/jwt";
+import { UserRole } from "../../../generated/prisma/enums";
 import { authGuard } from "../../../middlewares/auth.middleware";
 import { roleGuard } from "../../../middlewares/role.middleware";
 import { validateRequest } from "../../../middlewares/validateRequest";
@@ -9,7 +10,6 @@ import {
   updateChapterSchema,
 } from "../chapter.validation";
 import { chapterAdminController } from "./chapter.admin.controller";
-import { UserRole } from "../../../generated/prisma/enums";
 
 const chapterAdminRouter = Router();
 
