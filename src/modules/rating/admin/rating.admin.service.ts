@@ -14,7 +14,8 @@ export const adminRatingService = {
   },
 
   async toggleVisibility(ratingId: number) {
-    const rating = await ratingAdminRepository.toggleVisibilityAndRecalculate(ratingId);
+    const rating =
+      await ratingAdminRepository.toggleVisibilityAndRecalculate(ratingId);
     if (!rating) throw createHttpError(404, "Rating not found!");
   },
 };

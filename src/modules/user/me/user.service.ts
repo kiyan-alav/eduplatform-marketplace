@@ -79,7 +79,7 @@ export const userService = {
         await userRepository.createInstructorApplication(userId, documents);
 
       await notificationService.create({
-        user: userId,
+        userId,
         title: "Your request has been submitted",
         description:
           "After review, your instructor application will be approved or rejected. You will receive a notification once the review is complete.",

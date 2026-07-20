@@ -1,6 +1,9 @@
 import { prisma } from "../../../configs/prisma";
 import { Prisma } from "../../../generated/prisma/client";
-import { buildPagination, paginationMeta } from "../../../types/buildPagination";
+import {
+  buildPagination,
+  paginationMeta,
+} from "../../../types/buildPagination";
 import { GetAllRatingsQuery } from "../rating.types";
 
 export const ratingAdminRepository = {
@@ -27,8 +30,20 @@ export const ratingAdminRepository = {
       prisma.rating.count({ where }),
     ]);
 
-    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({ limit, page, totalDocs });
-    return { items, page, limit, totalDocs, totalPages, hasNextPage, hasPrevPage };
+    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({
+      limit,
+      page,
+      totalDocs,
+    });
+    return {
+      items,
+      page,
+      limit,
+      totalDocs,
+      totalPages,
+      hasNextPage,
+      hasPrevPage,
+    };
   },
 
   async findById(id: number) {

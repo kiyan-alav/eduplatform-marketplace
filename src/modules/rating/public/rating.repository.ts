@@ -35,6 +35,7 @@ export const ratingRepository = {
       page,
       totalDocs,
     });
+
     return {
       items,
       page,

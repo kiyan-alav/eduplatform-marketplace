@@ -1,5 +1,9 @@
 import createHttpError from "http-errors";
-import { GetAllLessonsQuery, ICreateLessonRequest, IUpdateLessonRequest } from "../lesson.types";
+import {
+  GetAllLessonsQuery,
+  ICreateLessonRequest,
+  IUpdateLessonRequest,
+} from "../lesson.types";
 import { lessonAdminRepository } from "./lesson.admin.repository";
 
 export const lessonAdminService = {
@@ -17,7 +21,9 @@ export const lessonAdminService = {
     const chapter = await lessonAdminRepository.findChapterById(data.chapterId);
     if (!chapter) throw createHttpError(404, "Chapter not found!");
 
-    const lastLesson = await lessonAdminRepository.findLastLessonInChapter(data.chapterId);
+    const lastLesson = await lessonAdminRepository.findLastLessonInChapter(
+      data.chapterId,
+    );
     const nextOrder = lastLesson ? lastLesson.order + 1 : 1;
 
     return lessonAdminRepository.createAndRecalculateDuration(data, nextOrder);
@@ -28,7 +34,9 @@ export const lessonAdminService = {
     if (!lesson) throw createHttpError(404, "Lesson not found!");
 
     if (data.chapterId !== undefined) {
-      const chapter = await lessonAdminRepository.findChapterById(data.chapterId);
+      const chapter = await lessonAdminRepository.findChapterById(
+        data.chapterId,
+      );
       if (!chapter) throw createHttpError(404, "Chapter not found!");
     }
 

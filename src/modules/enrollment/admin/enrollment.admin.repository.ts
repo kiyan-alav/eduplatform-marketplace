@@ -1,6 +1,9 @@
 import { prisma } from "../../../configs/prisma";
 import { Prisma } from "../../../generated/prisma/client";
-import { buildPagination, paginationMeta } from "../../../types/buildPagination";
+import {
+  buildPagination,
+  paginationMeta,
+} from "../../../types/buildPagination";
 import { GetAllEnrollmentsQuery } from "../enrollment.types";
 
 export const enrollmentAdminRepository = {
@@ -23,7 +26,9 @@ export const enrollmentAdminRepository = {
           course: { select: { id: true, title: true } },
           student: {
             include: {
-              user: { select: { id: true, fullName: true, email: true, avatar: true } },
+              user: {
+                select: { id: true, fullName: true, email: true, avatar: true },
+              },
             },
           },
         },
@@ -31,18 +36,35 @@ export const enrollmentAdminRepository = {
       prisma.enrollment.count({ where }),
     ]);
 
-    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({ limit, page, totalDocs });
-    return { items, page, limit, totalDocs, totalPages, hasNextPage, hasPrevPage };
+    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({
+      limit,
+      page,
+      totalDocs,
+    });
+
+    return {
+      items,
+      page,
+      limit,
+      totalDocs,
+      totalPages,
+      hasNextPage,
+      hasPrevPage,
+    };
   },
 
   async findById(studentId: number, courseId: number) {
     return prisma.enrollment.findUnique({
       where: { studentId_courseId: { studentId, courseId } },
       include: {
-        course: { select: { id: true, title: true, description: true, price: true } },
+        course: {
+          select: { id: true, title: true, description: true, price: true },
+        },
         student: {
           include: {
-            user: { select: { id: true, fullName: true, email: true, avatar: true } },
+            user: {
+              select: { id: true, fullName: true, email: true, avatar: true },
+            },
           },
         },
       },

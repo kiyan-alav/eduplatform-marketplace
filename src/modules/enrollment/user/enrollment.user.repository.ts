@@ -1,7 +1,13 @@
 import { prisma } from "../../../configs/prisma";
 import { Prisma } from "../../../generated/prisma/client";
-import { buildPagination, paginationMeta } from "../../../types/buildPagination";
-import { GetAllEnrollmentsQuery, ICreateEnrollmentRequest } from "../enrollment.types";
+import {
+  buildPagination,
+  paginationMeta,
+} from "../../../types/buildPagination";
+import {
+  GetAllEnrollmentsQuery,
+  ICreateEnrollmentRequest,
+} from "../enrollment.types";
 
 export const enrollmentUserRepository = {
   async getAll(params: GetAllEnrollmentsQuery, studentId: number) {
@@ -26,15 +32,36 @@ export const enrollmentUserRepository = {
       prisma.enrollment.count({ where }),
     ]);
 
-    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({ limit, page, totalDocs });
-    return { items, page, limit, totalDocs, totalPages, hasNextPage, hasPrevPage };
+    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({
+      limit,
+      page,
+      totalDocs,
+    });
+
+    return {
+      items,
+      page,
+      limit,
+      totalDocs,
+      totalPages,
+      hasNextPage,
+      hasPrevPage,
+    };
   },
 
   async findById(studentId: number, courseId: number) {
     return prisma.enrollment.findUnique({
       where: { studentId_courseId: { studentId, courseId } },
       include: {
-        course: { select: { id: true, title: true, description: true, price: true, cover: true } },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            cover: true,
+          },
+        },
       },
     });
   },
@@ -44,7 +71,10 @@ export const enrollmentUserRepository = {
   },
 
   async findCourseById(courseId: number) {
-    return prisma.course.findUnique({ where: { id: courseId }, select: { id: true } });
+    return prisma.course.findUnique({
+      where: { id: courseId },
+      select: { id: true },
+    });
   },
 
   async create(data: ICreateEnrollmentRequest) {

@@ -1,7 +1,14 @@
 import { prisma } from "../../../configs/prisma";
 import { Prisma } from "../../../generated/prisma/client";
-import { buildPagination, paginationMeta } from "../../../types/buildPagination";
-import { GetAllLessonsQuery, ICreateLessonRequest, IUpdateLessonRequest } from "../lesson.types";
+import {
+  buildPagination,
+  paginationMeta,
+} from "../../../types/buildPagination";
+import {
+  GetAllLessonsQuery,
+  ICreateLessonRequest,
+  IUpdateLessonRequest,
+} from "../lesson.types";
 
 export const lessonAdminRepository = {
   async getAll(params: GetAllLessonsQuery) {
@@ -16,12 +23,16 @@ export const lessonAdminRepository = {
 
     const [items, totalDocs] = await prisma.$transaction([
       prisma.lesson.findMany({
-        where, skip, take,
+        where,
+        skip,
+        take,
         orderBy: { order: "asc" },
         include: {
           chapter: {
             select: {
-              id: true, title: true, totalDuration: true,
+              id: true,
+              title: true,
+              totalDuration: true,
               course: { select: { id: true, title: true } },
             },
           },
@@ -30,8 +41,21 @@ export const lessonAdminRepository = {
       prisma.lesson.count({ where }),
     ]);
 
-    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({ limit, page, totalDocs });
-    return { items, page, limit, totalDocs, totalPages, hasNextPage, hasPrevPage };
+    const { totalPages, hasNextPage, hasPrevPage } = paginationMeta({
+      limit,
+      page,
+      totalDocs,
+    });
+
+    return {
+      items,
+      page,
+      limit,
+      totalDocs,
+      totalPages,
+      hasNextPage,
+      hasPrevPage,
+    };
   },
 
   async findById(id: number) {
@@ -40,7 +64,9 @@ export const lessonAdminRepository = {
       include: {
         chapter: {
           select: {
-            id: true, title: true, totalDuration: true,
+            id: true,
+            title: true,
+            totalDuration: true,
             course: { select: { id: true, title: true } },
           },
         },
@@ -49,21 +75,38 @@ export const lessonAdminRepository = {
   },
 
   async findChapterById(chapterId: number) {
-    return prisma.chapter.findUnique({ where: { id: chapterId }, select: { id: true } });
+    return prisma.chapter.findUnique({
+      where: { id: chapterId },
+      select: { id: true },
+    });
   },
 
   async findLastLessonInChapter(chapterId: number) {
-    return prisma.lesson.findFirst({ where: { chapterId }, orderBy: { order: "desc" }, select: { order: true } });
+    return prisma.lesson.findFirst({
+      where: { chapterId },
+      orderBy: { order: "desc" },
+      select: { order: true },
+    });
   },
 
-  async createAndRecalculateDuration(data: ICreateLessonRequest, order: number) {
+  async createAndRecalculateDuration(
+    data: ICreateLessonRequest,
+    order: number,
+  ) {
     return prisma.$transaction(async (tx) => {
       const lesson = await tx.lesson.create({
-        data: { title: data.title.trim(), chapterId: data.chapterId, duration: data.duration, order },
+        data: {
+          title: data.title.trim(),
+          chapterId: data.chapterId,
+          duration: data.duration,
+          order,
+        },
         include: {
           chapter: {
             select: {
-              id: true, title: true, totalDuration: true,
+              id: true,
+              title: true,
+              totalDuration: true,
               course: { select: { id: true, title: true } },
             },
           },
@@ -97,7 +140,9 @@ export const lessonAdminRepository = {
         include: {
           chapter: {
             select: {
-              id: true, title: true, totalDuration: true,
+              id: true,
+              title: true,
+              totalDuration: true,
               course: { select: { id: true, title: true } },
             },
           },

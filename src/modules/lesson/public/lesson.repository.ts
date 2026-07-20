@@ -76,7 +76,7 @@ export const lessonRepository = {
           select: {
             id: true,
             title: true,
-            totalDuration: true, 
+            totalDuration: true,
             course: {
               select: {
                 id: true,
