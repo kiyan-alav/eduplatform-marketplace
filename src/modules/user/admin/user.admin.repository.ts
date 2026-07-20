@@ -1,5 +1,5 @@
 import { prisma } from "../../../configs/prisma";
-import { Prisma } from "../../../generated/prisma/client";
+import { Prisma, UserRole } from "../../../generated/prisma/client";
 import {
   buildPagination,
   paginationMeta,
@@ -98,6 +98,9 @@ export const adminUserRepository = {
           contains: phone,
         },
       }),
+      roles: {
+        has: UserRole.INSTRUCTOR
+      }
     };
 
     const [items, totalDocs] = await prisma.$transaction([

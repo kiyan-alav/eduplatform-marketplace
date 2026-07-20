@@ -23,7 +23,7 @@ export const categoryAdminService = {
   async create(data: ICreateCategoryRequest) {
     const name = data.name.trim();
 
-    const rawSlug = data.slug.trim();
+    const rawSlug = data?.slug?.trim() || name;
 
     const slug = slugify(rawSlug, {
       lower: true,
@@ -88,12 +88,12 @@ export const categoryAdminService = {
   },
 
   async delete(id: number) {
-    const deleted = await adminCategoryRepository.delete(id);
+    const category = await adminCategoryRepository.findById(id);
 
-    if (!deleted) {
+    if (!category) {
       throw createHttpError(404, "Category not found!");
     }
 
-    return deleted;
+    return await adminCategoryRepository.delete(id);
   },
 };

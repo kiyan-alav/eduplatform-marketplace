@@ -48,7 +48,9 @@ export const adminCourseRepository = {
           instructor: {
             select: {
               id: true,
-              verification: true,
+              status: true,
+              documents: true,
+              isVerified: true,
               user: {
                 select: {
                   id: true,
@@ -107,10 +109,10 @@ export const adminCourseRepository = {
       data: {
         title: data.title.trim(),
         description: data.description.trim(),
-        instructorId: data.instructor,
+        instructorId: data.instructorId,
         price: data.price,
         level: data.level,
-        categoryId: data.category,
+        categoryId: data.categoryId,
         cover: cover ?? null,
         isPublished: true,
       },

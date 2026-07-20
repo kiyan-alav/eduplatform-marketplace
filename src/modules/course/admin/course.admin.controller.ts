@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { ENV } from "../../../configs/env";
+import { paramsSchema } from "../../../configs/jwt";
 import { buildApiResponse } from "../../../types/apiResponse";
 import { asyncHandler } from "../../../utils/asyncHandler";
-import { courseAdminService } from "./course.admin.service";
 import { CourseListQuerySchema } from "../course.filter";
-import { paramsSchema } from "../../../configs/jwt";
+import { courseAdminService } from "./course.admin.service";
 
 export const courseAdminController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {

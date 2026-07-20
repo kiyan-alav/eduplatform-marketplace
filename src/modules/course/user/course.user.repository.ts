@@ -146,17 +146,32 @@ export const userCourseRepository = {
   },
 
   async create(data: ICreateCourseRequest & { cover?: string | null }) {
-    const { title, description, instructor, price, level, category, cover } =
-      data;
+    const {
+      title,
+      description,
+      instructorId,
+      price,
+      level,
+      categoryId,
+      cover,
+    } = data;
 
     return prisma.course.create({
       data: {
         title,
         description,
-        instructorId: instructor,
+        instructor: {
+          connect: {
+            id: instructorId,
+          },
+        },
         price,
         level,
-        categoryId: category,
+        category: {
+          connect: {
+            id: categoryId,
+          },
+        },
         cover: cover ?? null,
       },
     });
@@ -170,12 +185,20 @@ export const userCourseRepository = {
         ...(data.description !== undefined && {
           description: data.description.trim(),
         }),
-        ...(data.instructor !== undefined && {
-          instructorId: data.instructor,
+        ...(data.instructorId !== undefined && {
+          instructor: {
+            connect: {
+              id: +data.instructorId,
+            },
+          },
         }),
         ...(data.price !== undefined && { price: data.price }),
         ...(data.level !== undefined && { level: data.level }),
-        ...(data.category !== undefined && { categoryId: data.category }),
+        ...(data.categoryId !== undefined && { category: {
+          connect: {
+            id: +data.categoryId
+          }
+        } }),
         ...(data.cover !== undefined && { cover: data.cover }),
       },
     });

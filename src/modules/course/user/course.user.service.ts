@@ -46,8 +46,19 @@ export const courseUserService = {
     const title = data.title.trim();
     const description = data.description?.trim();
 
+    const userId = Number(data.instructorId);
+    const categoryId = Number(data.categoryId);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw createHttpError(400, "Valid instructor ID is required.");
+    }
+
+    if (!Number.isInteger(categoryId) || categoryId <= 0) {
+      throw createHttpError(400, "Valid category ID is required.");
+    }
+
     const instructorProfile =
-      await userCourseRepository.findInstructorProfileByUserId(data.instructor);
+      await userCourseRepository.findInstructorProfileByUserId(userId);
 
     if (!instructorProfile) {
       throw createHttpError(
@@ -59,15 +70,15 @@ export const courseUserService = {
     const course = await userCourseRepository.create({
       title,
       description,
-      instructor: data.instructor,
+      instructorId: instructorProfile.id,
       price: data.price,
       level: data.level,
-      category: data.category,
+      categoryId,
       cover,
     });
 
     await notificationService.create({
-      userId: data.instructor,
+      userId,
       title: "Your course has been created",
       description:
         "After review, your course will be published and available for students.",
@@ -78,6 +89,11 @@ export const courseUserService = {
   },
 
   async edit(id: number, data: IUpdateCourseRequest, cover?: string) {
+    const userId = Number(data.instructorId);
+
+    const instructorProfile =
+      await userCourseRepository.findInstructorProfileByUserId(userId);
+
     const course = await userCourseRepository.findById(id);
 
     if (!course) {
@@ -87,6 +103,7 @@ export const courseUserService = {
     const updatedCourse = await userCourseRepository.update(id, {
       ...data,
       cover,
+      instructorId: instructorProfile?.id,
     });
 
     return updatedCourse;

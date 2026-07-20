@@ -1,36 +1,68 @@
-// import mongoose from "mongoose";
-// import { AdminProfile } from "./profiles/admin/admin.model";
-// import { User } from "./user.model";
-// import { UserRole } from "./user.types";
+import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
+import { ENV } from "../../configs/env";
+import { PrismaClient, UserRole } from "../../generated/prisma/client";
 
-// const MONGO_URI =
-//   process.env.MONGO_URI || "mongodb://localhost:27017/edu-platform";
+const connectionString = `${ENV.DATABASE_URL}`;
 
-// async function createAdmin() {
-//   try {
-//     console.log("Connecting to MongoDB...");
-//     await mongoose.connect(MONGO_URI);
-//     console.log("MongoDB connected");
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({
+  adapter,
+  log:
+    ENV.NODE_ENV === "development"
+      ? ["query", "info", "warn", "error"]
+      : ["error"],
+});
 
-//     const user = await User.findById("6a172b1862c16e7cfb793a9b");
+async function createAdmin() {
+  try {
+    console.log("Connecting to PostgreSQL via Prisma...");
 
-//     const admin = await AdminProfile.create({
-//       user: "6a172b1862c16e7cfb793a9b",
-//     });
+    const userId = 3;
 
-//     user.adminProfile = admin._id;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-//     user.roles.push(UserRole.ADMIN);
+    if (!user) {
+      throw new Error(`User not found with id: ${userId}`);
+    }
 
-//     await user.save();
+    const admin = await prisma.adminProfile.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
 
-//     console.log("Admin created successfully:", admin);
-//   } catch (error) {
-//     console.error("Error creating admin:", error);
-//   } finally {
-//     await mongoose.disconnect();
-//     console.log("MongoDB disconnected");
-//   }
-// }
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        adminProfile: {
+          connect: {
+            id: admin.id,
+          },
+        },
+        roles: {
+          push: UserRole.ADMIN,
+        },
+      },
+    });
 
-// createAdmin();
+    console.log("Admin created successfully:", admin);
+  } catch (error) {
+    console.error("Error creating admin:", error);
+  } finally {
+    await prisma.$disconnect();
+    console.log("Prisma disconnected");
+  }
+}
+
+createAdmin();

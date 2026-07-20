@@ -52,7 +52,7 @@ export const courseUserController = {
 
     const bodyData = {
       ...req.body,
-      instructor: req.user?.userId,
+      instructorId: req.user?.userId,
     };
 
     const course = await courseUserService.create(bodyData, cover);
@@ -75,7 +75,7 @@ export const courseUserController = {
 
     const bodyData = {
       ...req.body,
-      instructor: req.user?.userId,
+      instructorId: req.user?.userId,
     };
 
     const course = await courseUserService.edit(id, bodyData, cover);

@@ -69,8 +69,8 @@ export const userRepository = {
       const instructorProfile = await tx.instructorProfile.create({
         data: {
           userId,
-          verificationDocuments: documents,
-          verificationStatus: InstructorRequestStatus.PENDING,
+          documents: documents,
+          status: InstructorRequestStatus.PENDING,
           isVerified: false,
         },
       });

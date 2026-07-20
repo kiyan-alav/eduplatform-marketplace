@@ -52,7 +52,7 @@ export const adminUserController = {
     const response = buildApiResponse({
       success: true,
       message: "OK!",
-      data: instructorRequestsData.totalDocs,
+      data: instructorRequestsData.items,
       meta: {
         limit: instructorRequestsData.limit,
         page: instructorRequestsData.page as number,

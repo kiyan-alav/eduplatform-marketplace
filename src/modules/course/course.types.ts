@@ -18,17 +18,17 @@ export interface GetAllCourseQuery extends PaginationParams {
 export interface ICreateCourseRequest {
   title: string;
   description: string;
-  instructor: number;
+  instructorId: number;
   price: number;
   level: LevelType;
-  category: number;
+  categoryId: number;
 }
 
 export interface IUpdateCourseRequest {
   title?: string;
   description?: string;
-  instructor?: number;
+  instructorId?: number;
   price?: number;
   level?: LevelType;
-  category?: number;
+  categoryId?: number;
 }
