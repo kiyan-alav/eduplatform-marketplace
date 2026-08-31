@@ -6,7 +6,7 @@ import path from "path";
 import swaggerUi from "swagger-ui-express";
 import { logger } from "../configs/logger";
 
-const swaggerDir = import.meta.dirname;
+const swaggerDir = __dirname;
 
 const loadYamlFile = (filePath: string) => {
   if (!fs.existsSync(filePath)) {

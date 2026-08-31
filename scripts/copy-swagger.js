@@ -1,9 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require("fs");
+const path = require("path");
 
 function copyDir(src, dest) {
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
@@ -22,7 +18,13 @@ function copyDir(src, dest) {
 }
 
 const srcSwagger = path.join(__dirname, "..", "src", "swagger");
-const destSwagger = path.join(__dirname, "..", "dist", "swagger");
+const destSwagger = path.join(
+  __dirname,
+  "..",
+  "dist",
+  "src",
+  "swagger",
+);
 
 // console.log("srcSwagger =>", srcSwagger);
 // console.log("destSwagger =>", destSwagger);
