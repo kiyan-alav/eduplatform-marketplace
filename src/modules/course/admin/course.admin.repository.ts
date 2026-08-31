@@ -127,12 +127,12 @@ export const adminCourseRepository = {
         ...(data.description !== undefined && {
           description: data.description.trim(),
         }),
-        ...(data.instructor !== undefined && {
-          instructorId: data.instructor,
+        ...(data.instructorId !== undefined && {
+          instructorId: data.instructorId,
         }),
         ...(data.price !== undefined && { price: data.price }),
         ...(data.level !== undefined && { level: data.level }),
-        ...(data.category !== undefined && { categoryId: data.category }),
+        ...(data.categoryId !== undefined && { categoryId: data.categoryId }),
         ...(cover !== undefined && { cover }),
       },
     });
